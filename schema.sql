@@ -31,6 +31,15 @@ create table if not exists split_groups (
   paid_members text default '' -- Comma-separated paid members for cycle tracking
 );
 
+-- Access Grants & Permissions for API (Bypasses RLS blocks for educational backend MVC)
+alter table categories disable row level security;
+alter table services disable row level security;
+alter table split_groups disable row level security;
+
+grant usage on schema public to anon, authenticated, service_role;
+grant all on all tables in schema public to anon, authenticated, service_role;
+grant all on all sequences in schema public to anon, authenticated, service_role;
+
 -- 4. Initial Seed Data (Indonesian Digital Subscriptions)
 -- Insert Categories
 insert into categories (id, name) values
