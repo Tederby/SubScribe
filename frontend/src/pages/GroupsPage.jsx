@@ -1,7 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Cpu, Plus, Calendar, ShieldCheck, X, ChevronRight, Users, Wallet, ArrowUpRight } from "lucide-react";
+import { Cpu, Plus, Calendar, ShieldCheck, X, Users, Wallet, ArrowUpRight } from "lucide-react";
 import { dataService } from "../services/dataService";
+
+const currencyFormatter = new Intl.NumberFormat("id-ID", {
+  style: "currency",
+  currency: "IDR",
+  maximumFractionDigits: 0,
+});
 
 export default function GroupsPage() {
   const location = useLocation();
@@ -31,7 +37,7 @@ export default function GroupsPage() {
     }
   }, [location.state]);
 
-  const loadGroups = async () => {
+  const loadGroups = useCallback(async () => {
     try {
       setLoading(true);
       const [groupsRes, servicesRes] = await Promise.all([
@@ -45,11 +51,11 @@ export default function GroupsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadGroups();
-  }, []);
+  }, [loadGroups]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,12 +92,7 @@ export default function GroupsPage() {
     }
   };
 
-  const formatRupiah = (val) =>
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0,
-    }).format(val);
+  const formatRupiah = useCallback((val) => currencyFormatter.format(val), []);
 
   // Compute telemetry metrics
   const telemetry = useMemo(() => {
@@ -143,7 +144,7 @@ export default function GroupsPage() {
 
           <button
             onClick={() => setShowModal(true)}
-            className="px-3 py-2 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shrink-0 shadow-[0_0_8px_rgba(255,79,0,0.3)] active:scale-[0.98]"
+            className="px-3 py-2 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shrink-0 active:bg-[#ff651c]"
           >
             <Plus className="w-3.5 h-3.5" /> [ INITIALIZE_NEW_RACK ]
           </button>
@@ -205,10 +206,10 @@ export default function GroupsPage() {
         </div>
       )}
 
-      {/* Active Groups Rack (Responsive Grid: 1 col mobile, 2 col md, 3 col xl) */}
+      {/* Active Groups Rack (Responsive Grid with content-visibility containment) */}
       {loading ? (
         <div className="border border-dashed border-zinc-800 p-10 text-center text-xs text-zinc-500 space-y-1">
-          <div className="animate-pulse">SCANNING_RACK_NODES...</div>
+          <div>SCANNING_RACK_NODES...</div>
           <div className="text-[10px] text-zinc-600">POLLING_NODES</div>
         </div>
       ) : groups.length === 0 ? (
@@ -219,7 +220,7 @@ export default function GroupsPage() {
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="px-3 py-1.5 bg-[#FF4F00] text-black font-bold text-[10px] uppercase tracking-wider active:scale-[0.98]"
+            className="px-3 py-1.5 bg-[#FF4F00] text-black font-bold text-[10px] uppercase tracking-wider active:bg-[#ff651c]"
           >
             [ INITIALIZE FIRST GROUP &gt; ]
           </button>
@@ -248,15 +249,15 @@ export default function GroupsPage() {
               <Link
                 key={group.id}
                 to={`/groups/${group.id}`}
-                className="group flex flex-col justify-between bg-[#111214] border border-[#26282B] lg:hover:border-[#FF4F00] p-3.5 sm:p-4 relative transition-colors overflow-hidden active:bg-[#181A1D] active:scale-[0.99] duration-100"
+                className="apparatus-card group flex flex-col justify-between bg-[#111214] border border-[#26282B] lg:hover:border-[#FF4F00] p-3.5 sm:p-4 relative transition-colors overflow-hidden active:bg-[#16181B]"
               >
                 {/* Desktop hover scanline bar (Desktop only) */}
                 <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-[3px] bg-[#FF4F00] scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-150" />
 
-                <div className="absolute top-1 left-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00] transition-colors">
+                <div className="absolute top-1 left-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00]">
                   +
                 </div>
-                <div className="absolute top-1 right-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00] transition-colors">
+                <div className="absolute top-1 right-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00]">
                   +
                 </div>
 
@@ -266,7 +267,7 @@ export default function GroupsPage() {
                       <span className="text-[9px] text-[#DFFF00] uppercase tracking-wider font-bold">
                         {group.service_name}
                       </span>
-                      <h2 className="text-sm sm:text-base font-bold text-white lg:group-hover:text-[#FF4F00] transition-colors font-sans mt-0.5">
+                      <h2 className="text-sm sm:text-base font-bold text-white lg:group-hover:text-[#FF4F00] font-sans mt-0.5">
                         {group.group_name}
                       </h2>
                     </div>
@@ -323,9 +324,9 @@ export default function GroupsPage() {
         </div>
       )}
 
-      {/* Industrial Apparatus Initializer Modal (Responsive on Desktop & Mobile) */}
+      {/* Industrial Apparatus Initializer Modal (Solid Opaque, Zero Backdrop Blur) */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-3 sm:p-4">
+        <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-3 sm:p-4">
           <div className="bg-[#111214] border-2 border-[#26282B] w-full max-w-lg p-4 sm:p-5 space-y-3.5 max-h-[92vh] overflow-y-auto bracket-frame">
             <div className="flex items-center justify-between border-b border-[#26282B] pb-2 text-xs">
               <span className="text-[#FF4F00] font-bold text-sm">
@@ -460,7 +461,7 @@ export default function GroupsPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 bg-[#FF4F00] lg:hover:bg-[#ff651c] disabled:bg-zinc-800 text-black font-bold uppercase tracking-wider text-xs transition-colors mt-2 active:scale-[0.98]"
+                className="w-full py-3 bg-[#FF4F00] lg:hover:bg-[#ff651c] disabled:bg-zinc-800 text-black font-bold uppercase tracking-wider text-xs transition-colors mt-2 active:bg-[#ff651c]"
               >
                 {submitting ? "RECORDING_RACK..." : "[ COMMIT_NEW_GROUP ]"}
               </button>

@@ -190,7 +190,7 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex items-center gap-3 pt-1">
-              <div className="w-10 h-10 bg-[#FF4F00] text-black font-black text-xl flex items-center justify-center font-mono shadow-[0_0_10px_rgba(255,79,0,0.4)]">
+              <div className="w-10 h-10 bg-[#FF4F00] text-black font-black text-xl flex items-center justify-center font-mono">
                 S
               </div>
               <div>
@@ -241,12 +241,12 @@ export default function ProfilePage() {
             <div className="space-y-1.5 text-[11px]">
               <div className="flex justify-between items-center py-1 border-b border-dashed border-zinc-900">
                 <span className="text-zinc-500">OPERATOR:</span>
-                <span className="text-white font-bold font-sans">Praktikan SubScribe</span>
+                <span className="text-white font-bold font-sans">Muhammad Afiffatin Hariz</span>
               </div>
 
               <div className="flex justify-between items-center py-1 border-b border-dashed border-zinc-900">
                 <span className="text-zinc-500">STUDENT_NIM:</span>
-                <span className="text-zinc-200 font-mono">21120120140001</span>
+                <span className="text-zinc-200 font-mono">21120124130073</span>
               </div>
 
               <div className="flex justify-between items-center py-1 border-b border-dashed border-zinc-900">
@@ -340,21 +340,19 @@ export default function ProfilePage() {
               <div className="flex gap-1.5 shrink-0">
                 <button
                   onClick={() => setActiveFormTab("category")}
-                  className={`px-3 py-1 text-[9px] uppercase tracking-wider border transition-colors active:scale-[0.98] ${
-                    activeFormTab === "category"
-                      ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold shadow-[0_0_8px_rgba(255,79,0,0.3)]"
+                  className={`px-3 py-1 text-[9px] uppercase tracking-wider border transition-colors active:scale-[0.98] ${activeFormTab === "category"
+                      ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
                       : "bg-[#0E0F11] border-[#26282B] text-zinc-400 lg:hover:text-white"
-                  }`}
+                    }`}
                 >
                   + KATEGORI
                 </button>
                 <button
                   onClick={() => setActiveFormTab("service")}
-                  className={`px-3 py-1 text-[9px] uppercase tracking-wider border transition-colors active:scale-[0.98] ${
-                    activeFormTab === "service"
-                      ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold shadow-[0_0_8px_rgba(255,79,0,0.3)]"
+                  className={`px-3 py-1 text-[9px] uppercase tracking-wider border transition-colors active:scale-[0.98] ${activeFormTab === "service"
+                      ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
                       : "bg-[#0E0F11] border-[#26282B] text-zinc-400 lg:hover:text-white"
-                  }`}
+                    }`}
                 >
                   + LAYANAN
                 </button>
@@ -380,11 +378,10 @@ export default function ProfilePage() {
 
                 {catMessage && (
                   <div
-                    className={`p-2.5 border text-[10px] flex items-center gap-2 ${
-                      catMessage.type === "success"
+                    className={`p-2.5 border text-[10px] flex items-center gap-2 ${catMessage.type === "success"
                         ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
                         : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
-                    }`}
+                      }`}
                   >
                     {catMessage.type === "success" ? (
                       <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -489,11 +486,10 @@ export default function ProfilePage() {
 
                 {srvMessage && (
                   <div
-                    className={`p-2.5 border text-[10px] flex items-center gap-2 ${
-                      srvMessage.type === "success"
+                    className={`p-2.5 border text-[10px] flex items-center gap-2 ${srvMessage.type === "success"
                         ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
                         : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
-                    }`}
+                      }`}
                   >
                     {srvMessage.type === "success" ? (
                       <CheckCircle2 className="w-4 h-4 shrink-0" />

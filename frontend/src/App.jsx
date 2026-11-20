@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import BottomNav from "./components/BottomNav";
 import DesktopSidebar from "./components/DesktopSidebar";
+import TelemetryClock from "./components/TelemetryClock";
 import ServicesPage from "./pages/ServicesPage";
 import ServiceDetailPage from "./pages/ServiceDetailPage";
 import GroupsPage from "./pages/GroupsPage";
@@ -10,30 +11,15 @@ import ProfilePage from "./pages/ProfilePage";
 
 export default function App() {
   const location = useLocation();
-  const [time, setTime] = useState("");
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      setTime(
-        now.toLocaleTimeString("id-ID", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        }) + " WIB"
-      );
-    };
-    updateClock();
-    const timer = setInterval(updateClock, 1000);
-
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
+    window.addEventListener("online", handleOnline, { passive: true });
+    window.addEventListener("offline", handleOffline, { passive: true });
 
     return () => {
-      clearInterval(timer);
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
     };
@@ -50,18 +36,18 @@ export default function App() {
   };
 
   return (
-    <div className="w-full max-w-md lg:max-w-7xl xl:max-w-[1400px] mx-auto min-h-screen bg-[#141517] text-[#E5E5E0] relative border-x lg:border border-[#26282B] shadow-2xl flex flex-col pt-[env(safe-area-inset-top,0px)] lg:my-3">
-      {/* Top Apparatus Telemetry Header */}
-      <header className="px-3.5 py-2 border-b border-[#26282B] bg-[#0E0F11]/95 backdrop-blur-md flex items-center justify-between font-mono text-[9px] uppercase tracking-wider text-zinc-400 select-none sticky top-0 z-40">
+    <div className="w-full max-w-md lg:max-w-7xl xl:max-w-[1400px] mx-auto min-h-screen bg-[#141517] text-[#E5E5E0] relative border-x lg:border border-[#26282B] lg:shadow-2xl flex flex-col pt-[env(safe-area-inset-top,0px)] lg:my-3">
+      {/* Top Apparatus Telemetry Header (Solid Opaque, Zero Backdrop Blur for 60/120 FPS scrolling) */}
+      <header className="px-3.5 py-2 border-b border-[#26282B] bg-[#0E0F11] flex items-center justify-between font-mono text-[9px] uppercase tracking-wider text-zinc-400 select-none sticky top-0 z-40">
         <div className="flex items-center gap-2">
           <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              isOnline ? "bg-[#00E676] shadow-[0_0_5px_#00E676]" : "bg-[#FF4F00] animate-pulse"
+            className={`w-1.5 h-1.5 rounded-full ring-1 ${
+              isOnline ? "bg-[#00E676] ring-[#00E676]/40" : "bg-[#FF4F00] ring-[#FF4F00]/40"
             }`}
           />
           <span className="font-bold text-zinc-200">SYS.ID // SUB-01</span>
           <span className="text-zinc-600">|</span>
-          <span className="text-zinc-400 tabular-nums">{time || "--:--:--"}</span>
+          <TelemetryClock />
           <span className="hidden md:inline text-zinc-600">|</span>
           <span className="hidden md:inline text-zinc-500">APPARATUS_CONTROL_DESK</span>
         </div>
@@ -84,7 +70,7 @@ export default function App() {
         </div>
       </header>
 
-      {/* Secondary Location Telemetry Strip (Mobile only, on desktop it's in header) */}
+      {/* Secondary Location Telemetry Strip (Mobile only) */}
       <div className="lg:hidden px-3.5 py-1 bg-[#111214] border-b border-[#26282B] flex items-center justify-between font-mono text-[8px] text-zinc-500 uppercase tracking-widest select-none">
         <span className="text-[#FF4F00]">{getRouteCode()}</span>
         <span className="text-zinc-600">[ FIELD_TERMINAL ]</span>

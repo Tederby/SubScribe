@@ -99,14 +99,14 @@ export default function DesktopSidebar() {
       <div className="border border-[#26282B] bg-[#111214] p-3 space-y-2 bracket-frame">
         <div className="flex items-center justify-between text-[8px] font-mono uppercase text-zinc-500 border-b border-zinc-800 pb-1.5">
           <span className="flex items-center gap-1.5 text-[#00E676] font-bold">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00E676] shadow-[0_0_6px_#00E676] animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00E676] ring-1 ring-[#00E676]/50" />
             STATION // ALPHA-01
           </span>
           <span className="text-[#FF4F00] font-bold">DESKTOP_CONSOLE</span>
         </div>
 
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-[#FF4F00] text-black font-black text-lg flex items-center justify-center font-mono shadow-[0_0_10px_rgba(255,79,0,0.3)]">
+          <div className="w-9 h-9 bg-[#FF4F00] text-black font-black text-lg flex items-center justify-center font-mono">
             S
           </div>
           <div>
@@ -134,9 +134,9 @@ export default function DesktopSidebar() {
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `group relative flex items-center justify-between p-2.5 border transition-all duration-150 ${
+                  `group relative flex items-center justify-between p-2.5 border transition-colors ${
                     isActive
-                      ? "bg-[#181A1D] border-[#FF4F00] text-white shadow-[inset_0_0_12px_rgba(255,79,0,0.15)]"
+                      ? "bg-[#181A1D] border-[#FF4F00] text-white"
                       : "bg-[#111214] border-[#26282B] text-zinc-400 hover:border-zinc-500 hover:text-zinc-200 hover:bg-[#141517]"
                   }`
                 }
@@ -152,7 +152,7 @@ export default function DesktopSidebar() {
                       <div
                         className={`w-2 h-2 rounded-full transition-colors ${
                           isActive
-                            ? "bg-[#FF4F00] shadow-[0_0_6px_#FF4F00]"
+                            ? "bg-[#FF4F00] ring-1 ring-[#FF4F00]/50"
                             : "bg-zinc-700 group-hover:bg-zinc-500"
                         }`}
                       />

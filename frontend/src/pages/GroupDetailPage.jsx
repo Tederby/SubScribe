@@ -300,7 +300,7 @@ export default function GroupDetailPage() {
               href={getWaLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full py-2.5 px-4 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-xs uppercase tracking-widest text-center transition-all active:scale-[0.99] shadow-[0_0_10px_rgba(255,79,0,0.3)]"
+              className="block w-full py-2.5 px-4 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-xs uppercase tracking-widest text-center transition-colors active:scale-[0.99]"
             >
               [ BROADCAST KE WHATSAPP SEKARANG ]
             </a>
@@ -350,7 +350,7 @@ export default function GroupDetailPage() {
                         >
                           <span
                             className={`w-1.5 h-1.5 rounded-full ${
-                              isPaid ? "bg-[#00E676] shadow-[0_0_4px_#00E676]" : "bg-[#FF4F00]"
+                              isPaid ? "bg-[#00E676] ring-1 ring-[#00E676]/50" : "bg-[#FF4F00]"
                             }`}
                           />
                           <span>{isPaid ? "LUNAS" : "BELUM"}</span>

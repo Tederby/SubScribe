@@ -1,7 +1,8 @@
 import { NavLink } from "react-router-dom";
 import { Cpu, Layers, Terminal } from "lucide-react";
+import { memo } from "react";
 
-export default function BottomNav() {
+function BottomNav() {
   const navItems = [
     { to: "/services", label: "KATALOG", sub: "SYS.01", icon: Layers },
     { to: "/groups", label: "GRUP", sub: "SYS.02", icon: Cpu },
@@ -9,7 +10,7 @@ export default function BottomNav() {
   ];
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0E0F11]/95 backdrop-blur-md border-t border-[#26282B] z-50 pb-[env(safe-area-inset-bottom,0px)]">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-[#0E0F11] border-t border-[#26282B] z-50 pb-[env(safe-area-inset-bottom,0px)]">
       <div className="grid grid-cols-3 h-16 divide-x divide-[#26282B]">
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -18,7 +19,7 @@ export default function BottomNav() {
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `group flex flex-col items-center justify-center p-2 relative active:bg-[#1A1C20] transition-colors duration-100 ${
+                `flex flex-col items-center justify-center p-2 relative active:bg-[#16181B] ${
                   isActive
                     ? "bg-[#141517] text-white"
                     : "text-zinc-500"
@@ -29,8 +30,8 @@ export default function BottomNav() {
                 <>
                   {/* Top LED Indicator */}
                   <div
-                    className={`absolute top-1.5 w-1.5 h-1.5 rounded-full transition-colors duration-100 ${
-                      isActive ? "bg-[#FF4F00] shadow-[0_0_6px_#FF4F00]" : "bg-zinc-700"
+                    className={`absolute top-1.5 w-1.5 h-1.5 rounded-full ${
+                      isActive ? "bg-[#FF4F00] ring-1 ring-[#FF4F00]/50" : "bg-zinc-700"
                     }`}
                   />
 
@@ -40,7 +41,7 @@ export default function BottomNav() {
                   )}
 
                   <Icon
-                    className={`w-4 h-4 mt-1.5 mb-1 transition-colors duration-100 ${
+                    className={`w-4 h-4 mt-1.5 mb-1 ${
                       isActive ? "text-[#FF4F00]" : "text-zinc-500"
                     }`}
                   />
@@ -60,3 +61,5 @@ export default function BottomNav() {
     </nav>
   );
 }
+
+export default memo(BottomNav);

@@ -1,7 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Layers, ChevronRight, Activity, Search, X, SlidersHorizontal, ArrowUpRight } from "lucide-react";
+import { Layers, ChevronRight, Activity, Search, X, ArrowUpRight } from "lucide-react";
 import { dataService } from "../services/dataService";
+
+const currencyFormatter = new Intl.NumberFormat("id-ID", {
+  style: "currency",
+  currency: "IDR",
+  maximumFractionDigits: 0,
+});
 
 export default function ServicesPage() {
   const [services, setServices] = useState([]);
@@ -12,6 +18,7 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
     async function loadData() {
       try {
         setLoading(true);
@@ -19,24 +26,24 @@ export default function ServicesPage() {
           dataService.getServices(),
           dataService.getCategories(),
         ]);
-        setServices(servicesRes.data || []);
-        setCategories(categoriesRes.data || []);
-        setDataSource(servicesRes.source);
+        if (mounted) {
+          setServices(servicesRes.data || []);
+          setCategories(categoriesRes.data || []);
+          setDataSource(servicesRes.source);
+        }
       } catch (err) {
         console.error("Gagal membaca registry layanan:", err);
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
     loadData();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const formatRupiah = (val) =>
-    new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0,
-    }).format(val);
+  const formatRupiah = useCallback((val) => currencyFormatter.format(val), []);
 
   const filteredServices = useMemo(() => {
     return services.filter((item) => {
@@ -65,7 +72,7 @@ export default function ServicesPage() {
       <div className="border border-[#26282B] bg-[#111214] p-3 sm:p-4 relative bracket-frame">
         <div className="flex items-center justify-between border-b border-[#26282B] pb-2 mb-2 text-[9px] uppercase tracking-wider text-zinc-400">
           <span className="flex items-center gap-1.5 text-[#FF4F00] font-bold">
-            <Activity className="w-3.5 h-3.5 animate-pulse" /> SEC.01 // CATALOG_REGISTRY
+            <Activity className="w-3.5 h-3.5" /> SEC.01 // CATALOG_REGISTRY
           </span>
           <span className="text-zinc-400 tabular-nums">
             DATA_ORIGIN: {dataSource.toUpperCase()}
@@ -119,7 +126,7 @@ export default function ServicesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="RADAR SCAN // CARI NAMA ATAU SKU LAYANAN..."
-              className="w-full bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] pl-8 pr-8 py-2 text-xs text-white placeholder-zinc-600 focus:outline-none transition-colors"
+              className="w-full bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] pl-8 pr-8 py-2 text-xs text-white placeholder-zinc-600 focus:outline-none"
             />
             {searchQuery && (
               <button
@@ -140,9 +147,9 @@ export default function ServicesPage() {
         <div className="flex items-center gap-1.5 overflow-x-auto sm:flex-wrap pb-1 sm:pb-0 scrollbar-none">
           <button
             onClick={() => setSelectedCategory("all")}
-            className={`px-3 py-1.5 text-[10px] uppercase tracking-wider border shrink-0 transition-all active:scale-[0.98] ${
+            className={`px-3 py-1.5 text-[10px] uppercase tracking-wider border shrink-0 active:bg-zinc-800 ${
               selectedCategory === "all"
-                ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold shadow-[0_0_8px_rgba(255,79,0,0.4)]"
+                ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
                 : "bg-[#0E0F11] text-zinc-400 border-[#26282B] lg:hover:border-zinc-500 lg:hover:text-zinc-200"
             }`}
           >
@@ -152,9 +159,9 @@ export default function ServicesPage() {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3 py-1.5 text-[10px] uppercase tracking-wider border shrink-0 transition-all active:scale-[0.98] ${
+              className={`px-3 py-1.5 text-[10px] uppercase tracking-wider border shrink-0 active:bg-zinc-800 ${
                 selectedCategory === cat.id
-                  ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold shadow-[0_0_8px_rgba(255,79,0,0.4)]"
+                  ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
                   : "bg-[#0E0F11] text-zinc-400 border-[#26282B] lg:hover:border-zinc-500 lg:hover:text-zinc-200"
               }`}
             >
@@ -164,10 +171,10 @@ export default function ServicesPage() {
         </div>
       </div>
 
-      {/* Catalog Listing Units (Responsive Grid: 1 col on mobile, 2 on md, 3 on xl) */}
+      {/* Catalog Listing Units with content-visibility containment for 60/120 fps mobile scrolling */}
       {loading ? (
         <div className="border border-dashed border-zinc-800 p-10 text-center text-xs text-zinc-500 space-y-1">
-          <div className="animate-pulse">SCANNING_CATALOG_REGISTRY...</div>
+          <div>SCANNING_CATALOG_REGISTRY...</div>
           <div className="text-[10px] text-zinc-600">PLEASE_STANDBY</div>
         </div>
       ) : filteredServices.length === 0 ? (
@@ -193,16 +200,16 @@ export default function ServicesPage() {
               <Link
                 key={service.id}
                 to={`/services/${service.id}`}
-                className="group flex flex-col justify-between bg-[#111214] border border-[#26282B] lg:hover:border-[#FF4F00] transition-colors p-3.5 sm:p-4 relative overflow-hidden active:bg-[#181A1D] active:scale-[0.99] duration-100"
+                className="apparatus-card group flex flex-col justify-between bg-[#111214] border border-[#26282B] lg:hover:border-[#FF4F00] p-3.5 sm:p-4 relative overflow-hidden active:bg-[#16181B]"
               >
                 {/* Desktop hover scanline bar (Desktop only) */}
                 <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-[3px] bg-[#FF4F00] scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-150" />
 
                 {/* Corner registration marks */}
-                <div className="absolute top-1 left-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00] transition-colors">
+                <div className="absolute top-1 left-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00]">
                   +
                 </div>
-                <div className="absolute top-1 right-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00] transition-colors">
+                <div className="absolute top-1 right-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00]">
                   +
                 </div>
 
@@ -217,7 +224,7 @@ export default function ServicesPage() {
                           {service.categories?.name || "CAT.GENERAL"}
                         </span>
                       </div>
-                      <h2 className="text-sm sm:text-base font-bold text-white lg:group-hover:text-[#FF4F00] transition-colors font-sans tracking-tight">
+                      <h2 className="text-sm sm:text-base font-bold text-white lg:group-hover:text-[#FF4F00] font-sans tracking-tight">
                         {service.name}
                       </h2>
                     </div>

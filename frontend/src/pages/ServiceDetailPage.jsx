@@ -217,9 +217,9 @@ export default function ServiceDetailPage() {
                   <button
                     key={opt.slots}
                     onClick={() => setSelectedSlots(opt.slots)}
-                    className={`p-2.5 border text-left transition-all active:scale-[0.98] ${
+                    className={`p-2.5 border text-left active:scale-[0.98] ${
                       selectedSlots === opt.slots
-                        ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold shadow-[0_0_8px_rgba(255,79,0,0.3)]"
+                        ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
                         : "bg-[#0E0F11] border-[#26282B] text-zinc-300 lg:hover:border-zinc-500"
                     }`}
                   >
@@ -264,7 +264,7 @@ export default function ServiceDetailPage() {
                   },
                 })
               }
-              className="w-full py-3.5 px-4 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all active:scale-[0.99] shadow-[0_0_12px_rgba(255,79,0,0.3)]"
+              className="w-full py-3.5 px-4 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-colors active:scale-[0.99]"
             >
               <span>[ INITIALIZE_SPLIT_GROUP // DIAL TO RACK ]</span>
               <ChevronRight className="w-4 h-4" />
