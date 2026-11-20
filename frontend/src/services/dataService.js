@@ -28,9 +28,10 @@ export function sanitizeIndonesianPhone(input) {
 
 /**
  * Validates whether the phone number complies with standard Indonesian mobile format 628xxx (10 to 15 digits total).
+ * Returns true if empty (as phone is optional).
  */
 export function validateIndonesianPhone(phone) {
-  if (!phone) return false;
+  if (!phone || !phone.toString().trim()) return true;
   const cleaned = sanitizeIndonesianPhone(phone);
   return /^628[0-9]{8,12}$/.test(cleaned);
 }

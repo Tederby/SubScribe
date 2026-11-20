@@ -31,7 +31,7 @@ Base URL: `http://localhost:3000` (Local) / `/api` (Production)
 ### 3. Split Groups (`/api/groups`)
 - `GET /api/groups` - Fetch all split groups.
 - `GET /api/groups/:id` - Fetch single split group by UUID.
-- `POST /api/groups` - Create split group. Body:
+- `POST /api/groups` - Create split group (`group_name`, `service_name`, and `leader_name` required; `leader_phone` optional with `628xxx` format). Body:
   ```json
   {
     "group_name": "Netflix Nonton Bareng",

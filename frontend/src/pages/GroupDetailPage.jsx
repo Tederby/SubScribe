@@ -181,8 +181,8 @@ export default function GroupDetailPage() {
   const handleSaveEdit = async (e) => {
     e.preventDefault();
     if (!editConfirmStep) {
-      if (!validateIndonesianPhone(editLeaderPhone)) {
-        alert("Nomor WhatsApp PJ wajib menggunakan format 628xxx.");
+      if (editLeaderPhone.trim() && !validateIndonesianPhone(editLeaderPhone)) {
+        alert("Nomor WhatsApp PJ tidak valid. Gunakan format 628xxx (10-15 digit) atau kosongkan.");
         return;
       }
       setEditConfirmStep(true);
@@ -256,14 +256,15 @@ export default function GroupDetailPage() {
   const generateWaMessage = (targetName = "") => {
     const greeting = targetName ? `Halo ${targetName}!` : "Halo teman-teman!";
     const tariff = formatRupiah(group.price_per_person);
+    const leaderContact = group.leader_phone ? ` (${group.leader_phone})` : "";
 
     if (messageMode === "urgent") {
-      return `${greeting} PEMBERITAHUAN: Hari ini jatuh tempo pembayaran patungan *${group.service_name}* (*${group.group_name}*) sebesar *${tariff}*. Tolong segera transfer ke *${group.leader_name}* (${group.leader_phone}) agar akun bersama tidak terputus. Terima kasih!`;
+      return `${greeting} PEMBERITAHUAN: Hari ini jatuh tempo pembayaran patungan *${group.service_name}* (*${group.group_name}*) sebesar *${tariff}*. Tolong segera transfer ke *${group.leader_name}*${leaderContact} agar akun bersama tidak terputus. Terima kasih!`;
     }
     if (messageMode === "receipt") {
       return `${greeting} KONFIRMASI: Pembayaran patungan *${group.service_name}* sebesar *${tariff}* telah diterima lunas oleh *${group.leader_name}*. Akun aktif untuk periode ini. Terima kasih atas kerjasamanya!`;
     }
-    return `${greeting} Pengingat patungan langganan *${group.service_name}* (*${group.group_name}*) untuk bulan ini sebesar *${tariff}* (Jatuh tempo tgl ${group.billing_day}). Mohon transfer ke *${group.leader_name}* (${group.leader_phone}). Makasih!`;
+    return `${greeting} Pengingat patungan langganan *${group.service_name}* (*${group.group_name}*) untuk bulan ini sebesar *${tariff}* (Jatuh tempo tgl ${group.billing_day}). Mohon transfer ke *${group.leader_name}*${leaderContact}. Makasih!`;
   };
 
   const getWaLink = (targetName = "") => {
@@ -364,7 +365,9 @@ export default function GroupDetailPage() {
                 <div className="flex items-center gap-1.5 text-zinc-400">
                   <Phone className="w-3.5 h-3.5 text-[#00E676]" />
                   <span className="text-zinc-400">WA:</span>
-                  <span className="text-zinc-300 tabular-nums">{group.leader_phone}</span>
+                  <span className="text-zinc-300 tabular-nums">
+                    {group.leader_phone || "[TIDAK TERCATAT]"}
+                  </span>
                 </div>
               </div>
 
@@ -674,11 +677,11 @@ export default function GroupDetailPage() {
                 </div>
                 <div>
                   <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    NO. WHATSAPP PJ (628xxx) *
+                    NO. WHATSAPP PJ (OPSIONAL, 628xxx)
                   </label>
                   <input
                     type="text"
-                    required
+                    placeholder="6281234567890 (Opsional)"
                     value={editLeaderPhone}
                     onChange={handleEditPhoneChange}
                     className={`w-full bg-[#0E0F11] border px-3 py-1.5 text-white focus:outline-none ${

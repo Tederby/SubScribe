@@ -26,17 +26,17 @@ export const groupController = {
   async create(req, res) {
     try {
       const { group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members } = req.body;
-      if (!group_name || !service_name || !leader_name || !leader_phone) {
+      if (!group_name || !service_name || !leader_name) {
         return res.status(400).json({
           success: false,
-          message: "Field 'group_name', 'service_name', 'leader_name', dan 'leader_phone' wajib diisi"
+          message: "Field 'group_name', 'service_name', dan 'leader_name' wajib diisi"
         });
       }
       const payload = {
         group_name,
         service_name,
         leader_name,
-        leader_phone,
+        leader_phone: leader_phone || "",
         price_per_person: price_per_person !== undefined ? Number(price_per_person) : 0,
         billing_day: billing_day !== undefined ? parseInt(billing_day, 10) : 1,
         member_list: member_list || "",

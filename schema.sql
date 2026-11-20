@@ -24,7 +24,7 @@ create table if not exists split_groups (
   group_name text not null,
   service_name text not null,
   leader_name text not null,
-  leader_phone text not null, -- Format baku Indonesia: 628xxx
+  leader_phone text default '', -- Opsional, format baku Indonesia: 628xxx
   price_per_person numeric(12,2) default 0,
   billing_day integer default 1,
   member_list text, -- Comma-separated names, e.g. "Budi, Andi, Siti"

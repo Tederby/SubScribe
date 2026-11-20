@@ -224,8 +224,8 @@ export default function GroupsPage() {
       return;
     }
 
-    if (!validateIndonesianPhone(leaderPhone)) {
-      alert("Nomor WhatsApp PJ wajib menggunakan format 628xxx (10-15 digit).");
+    if (leaderPhone.trim() && !validateIndonesianPhone(leaderPhone)) {
+      alert("Nomor WhatsApp PJ tidak valid. Gunakan format 628xxx (10-15 digit) atau kosongkan.");
       return;
     }
 
@@ -593,12 +593,11 @@ export default function GroupsPage() {
 
                 <div>
                   <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1 flex items-center gap-1">
-                    <Phone className="w-3 h-3 text-[#00E676]" /> NO. WHATSAPP PJ (WAJIB 628xxx) *
+                    <Phone className="w-3 h-3 text-[#00E676]" /> NO. WHATSAPP PJ (OPSIONAL)
                   </label>
                   <input
                     type="text"
-                    required
-                    placeholder="6281234567890"
+                    placeholder="6281234567890 (Opsional)"
                     value={leaderPhone}
                     onChange={handlePhoneChange}
                     className={`w-full bg-[#0E0F11] border px-3 py-1.5 text-white focus:outline-none ${
@@ -611,7 +610,7 @@ export default function GroupsPage() {
                     </span>
                   ) : (
                     <span className="text-[9px] text-zinc-500 block mt-0.5">
-                      Otomatis distandarisasi ke format 628xxx
+                      Boleh dikosongkan. Jika diisi, gunakan format 628xxx
                     </span>
                   )}
                 </div>

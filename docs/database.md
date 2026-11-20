@@ -31,7 +31,7 @@ Engine: Supabase PostgreSQL (defined in `schema.sql`).
 │ group_name (TEXT)    │
 │ service_name (TEXT)  │
 │ leader_name (TEXT)   │
-│ leader_phone (TEXT)  │  (format: 628xxx)
+│ leader_phone (TEXT)  │  (opsional, format baku: 628xxx)
 │ price_per_person(NUM)│
 │ billing_day (INT)    │
 │ member_list (TEXT)   │
