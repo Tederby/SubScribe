@@ -38,6 +38,9 @@ SubScribe follows a two-tier monorepo architecture:
 - **Aesthetic:** Utilitarian / Industrial (Technical Apparatus), inspired by hardware synthesizers (Teenage Engineering).
 - **Color Tokens:** Matte carbon base (`#141517`), frame (`#0E0F11`), Safety Orange (`#FF4F00`), Acid Yellow (`#DFFF00`), LED Green (`#00E676`).
 - **Typography:** ≥ 50% Monospace (`font-mono`, `tabular-nums`), uppercase wide tracking.
+- **Dual-Form Adaptive Architecture:**
+  - **Mobile (Handheld Field Terminal):** Compact edge-to-edge container, touch-first active responses (`active:scale-[0.98]`, suppression of sticky touch hovers via `@media (hover: none)`), and persistent bottom apparatus navigation rack (`BottomNav`).
+  - **Desktop (Master Apparatus Console):** Widescreen workstation (`max-w-7xl` / `1400px`), dedicated hardware sidebar (`DesktopSidebar`) with station telemetry and hotkey routing (`1`, `2`, `3`), multi-column responsive command grids (`grid-cols-12` split consoles for catalog and detail inspectors), and mouse hover scanline physics.
 - **PWA & Android APK Optimization:**
   - `viewport-fit=cover` with safe-area insets (`env(safe-area-inset-top)` / `env(safe-area-inset-bottom)`).
   - Touch latency optimization (`touch-action: manipulation`, tap-highlight removal).

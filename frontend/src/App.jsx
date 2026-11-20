@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import BottomNav from "./components/BottomNav";
+import DesktopSidebar from "./components/DesktopSidebar";
 import ServicesPage from "./pages/ServicesPage";
 import ServiceDetailPage from "./pages/ServiceDetailPage";
 import GroupsPage from "./pages/GroupsPage";
@@ -49,7 +50,7 @@ export default function App() {
   };
 
   return (
-    <div className="max-w-md mx-auto min-h-screen bg-[#141517] text-[#E5E5E0] relative border-x border-[#26282B] shadow-2xl flex flex-col pt-[env(safe-area-inset-top,0px)]">
+    <div className="w-full max-w-md lg:max-w-7xl xl:max-w-[1400px] mx-auto min-h-screen bg-[#141517] text-[#E5E5E0] relative border-x lg:border border-[#26282B] shadow-2xl flex flex-col pt-[env(safe-area-inset-top,0px)] lg:my-3">
       {/* Top Apparatus Telemetry Header */}
       <header className="px-3.5 py-2 border-b border-[#26282B] bg-[#0E0F11]/95 backdrop-blur-md flex items-center justify-between font-mono text-[9px] uppercase tracking-wider text-zinc-400 select-none sticky top-0 z-40">
         <div className="flex items-center gap-2">
@@ -61,10 +62,16 @@ export default function App() {
           <span className="font-bold text-zinc-200">SYS.ID // SUB-01</span>
           <span className="text-zinc-600">|</span>
           <span className="text-zinc-400 tabular-nums">{time || "--:--:--"}</span>
+          <span className="hidden md:inline text-zinc-600">|</span>
+          <span className="hidden md:inline text-zinc-500">APPARATUS_CONTROL_DESK</span>
         </div>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-2">
           <span className="hidden sm:inline text-zinc-500">SPEC_REV 2.04</span>
+          <span className="hidden lg:inline text-zinc-600">|</span>
+          <span className="hidden lg:inline text-[#FF4F00] font-bold">
+            {getRouteCode()}
+          </span>
           <span
             className={`px-1.5 py-0.5 border text-[8px] font-bold tracking-widest ${
               isOnline
@@ -77,26 +84,32 @@ export default function App() {
         </div>
       </header>
 
-      {/* Secondary Location Telemetry Strip */}
-      <div className="px-3.5 py-1 bg-[#111214] border-b border-[#26282B] flex items-center justify-between font-mono text-[8px] text-zinc-500 uppercase tracking-widest select-none">
+      {/* Secondary Location Telemetry Strip (Mobile only, on desktop it's in header) */}
+      <div className="lg:hidden px-3.5 py-1 bg-[#111214] border-b border-[#26282B] flex items-center justify-between font-mono text-[8px] text-zinc-500 uppercase tracking-widest select-none">
         <span className="text-[#FF4F00]">{getRouteCode()}</span>
-        <span className="text-zinc-600">[ 360px x VIEWPORT ]</span>
+        <span className="text-zinc-600">[ FIELD_TERMINAL ]</span>
       </div>
 
-      {/* Main Content Viewport */}
-      <main className="flex-1 pb-[calc(5rem+env(safe-area-inset-bottom,0px))]">
-        <Routes>
-          <Route path="/" element={<Navigate to="/services" replace />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/services/:id" element={<ServiceDetailPage />} />
-          <Route path="/groups" element={<GroupsPage />} />
-          <Route path="/groups/:id" element={<GroupDetailPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="*" element={<Navigate to="/services" replace />} />
-        </Routes>
-      </main>
+      {/* Main Workstation Container (Sidebar + Content) */}
+      <div className="flex-1 flex flex-col lg:flex-row min-h-0">
+        {/* Left Desktop Sidebar (Hidden on Mobile) */}
+        <DesktopSidebar />
 
-      {/* Persistent Hardware Rack Navigation */}
+        {/* Content Viewport */}
+        <main className="flex-1 min-w-0 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] lg:pb-8 p-3 sm:p-4 lg:p-6 overflow-y-auto">
+          <Routes>
+            <Route path="/" element={<Navigate to="/services" replace />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/:id" element={<ServiceDetailPage />} />
+            <Route path="/groups" element={<GroupsPage />} />
+            <Route path="/groups/:id" element={<GroupDetailPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="*" element={<Navigate to="/services" replace />} />
+          </Routes>
+        </main>
+      </div>
+
+      {/* Persistent Mobile Bottom Navigation (Hidden on Desktop) */}
       <BottomNav />
     </div>
   );
