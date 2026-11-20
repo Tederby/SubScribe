@@ -1,11 +1,11 @@
-# SubScribe 📡
+# SubScribe
 
 > **Digital Subscription & Split-Bill Tracker Progressive Web App (PWA)**  
 > Dibangun dengan arsitektur Utilitarian / Industrial (Technical Apparatus) terinspirasi oleh Teenage Engineering.
 
 ---
 
-## 📋 Daftar Isi
+## Daftar Isi
 1. [Gambaran Umum](#gambaran-umum)
 2. [Tech Stack](#tech-stack)
 3. [Struktur Repositori](#struktur-repositori)
@@ -226,9 +226,9 @@ Buka **`http://localhost:5173`** di peramban web:
 
 ## Dokumentasi Lengkap
 Untuk spesifikasi arsitektur teknis lebih mendalam, silakan baca dokumen di folder [`docs/`](./docs/):
-- 📐 [Arsitektur Sistem](./docs/architecture.md)
-- 🔌 [Spesifikasi API Endpoint](./docs/api.md)
-- 🗄️ [Desain Basis Data](./docs/database.md)
+- [Arsitektur Sistem](./docs/architecture.md)
+- [Spesifikasi API Endpoint](./docs/api.md)
+- [Desain Database](./docs/database.md)
 
 ---
 
