@@ -257,7 +257,7 @@ export default function ProfilePage() {
               <div className="flex justify-between items-center py-1">
                 <span className="text-zinc-400">SOURCE_HUB:</span>
                 <a
-                  href="https://github.com"
+                  href="https://github.com/Tederby/SubScribe"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#DFFF00] hover:underline flex items-center gap-1 text-[10px]"
@@ -341,8 +341,8 @@ export default function ProfilePage() {
                 <button
                   onClick={() => setActiveFormTab("category")}
                   className={`px-3 py-1 text-[9px] uppercase tracking-wider border transition-colors active:scale-[0.98] ${activeFormTab === "category"
-                      ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
-                      : "bg-[#0E0F11] border-[#26282B] text-zinc-400 lg:hover:text-white"
+                    ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
+                    : "bg-[#0E0F11] border-[#26282B] text-zinc-400 lg:hover:text-white"
                     }`}
                 >
                   + KATEGORI
@@ -350,8 +350,8 @@ export default function ProfilePage() {
                 <button
                   onClick={() => setActiveFormTab("service")}
                   className={`px-3 py-1 text-[9px] uppercase tracking-wider border transition-colors active:scale-[0.98] ${activeFormTab === "service"
-                      ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
-                      : "bg-[#0E0F11] border-[#26282B] text-zinc-400 lg:hover:text-white"
+                    ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
+                    : "bg-[#0E0F11] border-[#26282B] text-zinc-400 lg:hover:text-white"
                     }`}
                 >
                   + LAYANAN
@@ -379,8 +379,8 @@ export default function ProfilePage() {
                 {catMessage && (
                   <div
                     className={`p-2.5 border text-[10px] flex items-center gap-2 ${catMessage.type === "success"
-                        ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
-                        : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
+                      ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
+                      : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
                       }`}
                   >
                     {catMessage.type === "success" ? (
@@ -487,8 +487,8 @@ export default function ProfilePage() {
                 {srvMessage && (
                   <div
                     className={`p-2.5 border text-[10px] flex items-center gap-2 ${srvMessage.type === "success"
-                        ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
-                        : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
+                      ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
+                      : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
                       }`}
                   >
                     {srvMessage.type === "success" ? (
