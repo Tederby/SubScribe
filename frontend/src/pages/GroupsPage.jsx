@@ -1,13 +1,74 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Cpu, Plus, Calendar, ShieldCheck, X, Users, Wallet, ArrowUpRight } from "lucide-react";
-import { dataService } from "../services/dataService";
+import {
+  Cpu,
+  Plus,
+  Calendar,
+  ShieldCheck,
+  X,
+  Users,
+  Wallet,
+  ArrowUpRight,
+  User,
+  Phone,
+  AlertCircle,
+  Tag,
+  Check,
+} from "lucide-react";
+import {
+  dataService,
+  sanitizeIndonesianPhone,
+  validateIndonesianPhone,
+} from "../services/dataService";
 
 const currencyFormatter = new Intl.NumberFormat("id-ID", {
   style: "currency",
   currency: "IDR",
   maximumFractionDigits: 0,
 });
+
+/**
+ * Accurately computes remaining days until next billing day,
+ * handling varying month lengths (28, 29, 30, 31).
+ */
+function calculateDueDays(billingDay) {
+  const now = new Date();
+  const currentDay = now.getDate();
+  const daysInCurrentMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0
+  ).getDate();
+
+  const effectiveBillingDay = Math.min(billingDay, daysInCurrentMonth);
+
+  if (effectiveBillingDay === currentDay) {
+    return { days: 0, label: "DUE TODAY!", isUrgent: true };
+  }
+
+  if (effectiveBillingDay > currentDay) {
+    const diff = effectiveBillingDay - currentDay;
+    return {
+      days: diff,
+      label: `${diff} HARI LAGI`,
+      isUrgent: diff <= 3,
+    };
+  }
+
+  // Next month rollover
+  const daysInNextMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 2,
+    0
+  ).getDate();
+  const effectiveNextBillingDay = Math.min(billingDay, daysInNextMonth);
+  const diff = daysInCurrentMonth - currentDay + effectiveNextBillingDay;
+  return {
+    days: diff,
+    label: `${diff} HARI LAGI`,
+    isUrgent: false,
+  };
+}
 
 export default function GroupsPage() {
   const location = useLocation();
@@ -22,20 +83,17 @@ export default function GroupsPage() {
   const [serviceName, setServiceName] = useState("");
   const [leaderName, setLeaderName] = useState("");
   const [leaderPhone, setLeaderPhone] = useState("");
-  const [pricePerPerson, setPricePerPerson] = useState("");
+  const [totalPrice, setTotalPrice] = useState("");
   const [billingDay, setBillingDay] = useState(1);
-  const [memberList, setMemberList] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
 
-  useEffect(() => {
-    if (location.state?.prefillServiceName) {
-      setServiceName(location.state.prefillServiceName);
-      if (location.state.prefillPrice) {
-        setPricePerPerson(location.state.prefillPrice.toString());
-      }
-      setShowModal(true);
-    }
-  }, [location.state]);
+  // Enhanced Member roster state in init modal
+  const [leaderIncluded, setLeaderIncluded] = useState(true);
+  const [memberChips, setMemberChips] = useState([]);
+  const [newMemberInput, setNewMemberInput] = useState("");
+
+  const formatRupiah = useCallback((val) => currencyFormatter.format(val), []);
 
   const loadGroups = useCallback(async () => {
     try {
@@ -57,32 +115,123 @@ export default function GroupsPage() {
     loadGroups();
   }, [loadGroups]);
 
+  // Handle prefill from ServiceDetailPage
+  useEffect(() => {
+    if (location.state?.prefillServiceName) {
+      setServiceName(location.state.prefillServiceName);
+      if (location.state.prefillTotalMonthlyPrice) {
+        setTotalPrice(location.state.prefillTotalMonthlyPrice.toString());
+      } else if (location.state.prefillPrice) {
+        setTotalPrice(
+          (
+            Number(location.state.prefillPrice) *
+            (location.state.prefillSlots || 4)
+          ).toString()
+        );
+      }
+      setShowModal(true);
+    }
+  }, [location.state]);
+
+  // Synchronize leader phone input with 628xxx format
+  const handlePhoneChange = (e) => {
+    const raw = e.target.value;
+    const sanitized = sanitizeIndonesianPhone(raw);
+    setLeaderPhone(sanitized);
+
+    if (sanitized && !validateIndonesianPhone(sanitized)) {
+      setPhoneError("Nomor wajib format 628xxx (Contoh: 6281234567890)");
+    } else {
+      setPhoneError("");
+    }
+  };
+
+  // Add member chip
+  const handleAddMemberChip = () => {
+    const trimmed = newMemberInput.trim();
+    if (!trimmed) return;
+
+    // Check if comma separated input
+    if (trimmed.includes(",")) {
+      const parts = trimmed
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+      setMemberChips((prev) => [
+        ...prev,
+        ...parts.filter((p) => !prev.includes(p) && p !== leaderName.trim()),
+      ]);
+    } else {
+      if (!memberChips.includes(trimmed) && trimmed !== leaderName.trim()) {
+        setMemberChips((prev) => [...prev, trimmed]);
+      }
+    }
+    setNewMemberInput("");
+  };
+
+  const handleRemoveMemberChip = (nameToRemove) => {
+    setMemberChips((prev) => prev.filter((m) => m !== nameToRemove));
+  };
+
+  // Effective full roster list
+  const activeRoster = useMemo(() => {
+    const list = [...memberChips];
+    if (leaderIncluded && leaderName.trim()) {
+      list.unshift(leaderName.trim());
+    }
+    return list;
+  }, [memberChips, leaderIncluded, leaderName]);
+
+  // Real-time calculation of price per person
+  const calculatedPricePerPerson = useMemo(() => {
+    const total = Number(totalPrice) || 0;
+    const count = activeRoster.length || 1;
+    return Math.round(total / count);
+  }, [totalPrice, activeRoster]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!groupName || !serviceName || !leaderName || !leaderPhone) {
-      alert("Field wajib belum terisi.");
+
+    if (!groupName.trim() || !serviceName.trim() || !leaderName.trim()) {
+      alert("Field nama grup, layanan, dan nama PJ wajib diisi.");
+      return;
+    }
+
+    if (!validateIndonesianPhone(leaderPhone)) {
+      alert("Nomor WhatsApp PJ wajib menggunakan format 628xxx (10-15 digit).");
+      return;
+    }
+
+    if (activeRoster.length === 0) {
+      alert("Minimal harus ada 1 anggota dalam grup patungan.");
       return;
     }
 
     try {
       setSubmitting(true);
+      const paidInitial = leaderIncluded && leaderName.trim() ? [leaderName.trim()] : [];
+
       await dataService.createGroup({
         group_name: groupName.trim(),
         service_name: serviceName.trim(),
         leader_name: leaderName.trim(),
         leader_phone: leaderPhone.trim(),
-        price_per_person: Number(pricePerPerson) || 0,
+        price_per_person: calculatedPricePerPerson,
         billing_day: Number(billingDay) || 1,
-        member_list: memberList.trim(),
+        member_list: activeRoster.join(", "),
+        paid_members: paidInitial,
       });
 
       setShowModal(false);
+      // Reset form
       setGroupName("");
       setServiceName("");
       setLeaderName("");
       setLeaderPhone("");
-      setPricePerPerson("");
-      setMemberList("");
+      setTotalPrice("");
+      setMemberChips([]);
+      setNewMemberInput("");
+      setLeaderIncluded(true);
       await loadGroups();
     } catch (err) {
       console.error(err);
@@ -91,8 +240,6 @@ export default function GroupsPage() {
       setSubmitting(false);
     }
   };
-
-  const formatRupiah = useCallback((val) => currencyFormatter.format(val), []);
 
   // Compute telemetry metrics
   const telemetry = useMemo(() => {
@@ -119,8 +266,6 @@ export default function GroupsPage() {
     );
   }, [groups, searchFilter]);
 
-  const currentDay = new Date().getDate();
-
   return (
     <div className="space-y-4 font-mono">
       {/* Telemetry Header */}
@@ -144,13 +289,13 @@ export default function GroupsPage() {
 
           <button
             onClick={() => setShowModal(true)}
-            className="px-3 py-2 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shrink-0 active:bg-[#ff651c]"
+            className="px-3.5 py-2 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shrink-0 active:bg-[#ff651c] shadow-md"
           >
             <Plus className="w-3.5 h-3.5" /> [ INITIALIZE_NEW_RACK ]
           </button>
         </div>
 
-        {/* Global Rack Metrics (Responsive 3-grid on Desktop) */}
+        {/* Global Rack Metrics */}
         <div className="mt-3.5 pt-3 border-t border-dashed border-zinc-800 grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 select-none">
           <div className="bg-[#0E0F11] border border-[#26282B] p-2.5 flex items-center justify-between">
             <div>
@@ -161,7 +306,7 @@ export default function GroupsPage() {
                 {telemetry.totalMembers} HEADS
               </div>
             </div>
-            <div className="text-[9px] text-zinc-400 font-mono">POOLED</div>
+            <div className="text-[9px] text-zinc-500 font-mono">POOLED</div>
           </div>
 
           <div className="bg-[#0E0F11] border border-[#26282B] p-2.5 flex items-center justify-between">
@@ -173,7 +318,7 @@ export default function GroupsPage() {
                 {formatRupiah(telemetry.totalMonthlyPool)}
               </div>
             </div>
-            <div className="text-[9px] text-zinc-400 font-mono">FLOW</div>
+            <div className="text-[9px] text-zinc-500 font-mono">FLOW</div>
           </div>
 
           <div className="hidden lg:flex bg-[#0E0F11] border border-[#26282B] p-2.5 items-center justify-between">
@@ -182,10 +327,10 @@ export default function GroupsPage() {
                 <Calendar className="w-3 h-3 text-[#DFFF00]" /> JATUH TEMPO AKTIF
               </div>
               <div className="text-xs sm:text-sm font-bold text-[#DFFF00] tabular-nums mt-0.5">
-                {groups.filter((g) => Math.abs(g.billing_day - currentDay) <= 3).length} SEGERA
+                {groups.filter((g) => calculateDueDays(g.billing_day).isUrgent).length} SEGERA
               </div>
             </div>
-            <div className="text-[9px] text-zinc-400 font-mono">CYCLE</div>
+            <div className="text-[9px] text-zinc-500 font-mono">CYCLE</div>
           </div>
         </div>
       </div>
@@ -206,7 +351,7 @@ export default function GroupsPage() {
         </div>
       )}
 
-      {/* Active Groups Rack (Responsive Grid with content-visibility containment) */}
+      {/* Active Groups Rack */}
       {loading ? (
         <div className="border border-dashed border-zinc-800 p-10 text-center text-xs text-zinc-500 space-y-1">
           <div>SCANNING_RACK_NODES...</div>
@@ -235,15 +380,7 @@ export default function GroupsPage() {
               ? group.paid_members.filter((m) => members.includes(m)).length
               : 0;
             const isSettled = members.length > 0 && paidCount === members.length;
-
-            // Due date calculation
-            const diffDays = group.billing_day - currentDay;
-            const dueLabel =
-              diffDays === 0
-                ? "DUE TODAY!"
-                : diffDays > 0
-                ? `${diffDays} HARI LAGI`
-                : `${30 + diffDays} HARI LAGI`;
+            const dueInfo = calculateDueDays(group.billing_day);
 
             return (
               <Link
@@ -251,7 +388,7 @@ export default function GroupsPage() {
                 to={`/groups/${group.id}`}
                 className="apparatus-card group flex flex-col justify-between bg-[#111214] border border-[#26282B] lg:hover:border-[#FF4F00] p-3.5 sm:p-4 relative transition-colors overflow-hidden active:bg-[#16181B]"
               >
-                {/* Desktop hover scanline bar (Desktop only) */}
+                {/* Desktop hover scanline bar */}
                 <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-[3px] bg-[#FF4F00] scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-150" />
 
                 <div className="absolute top-1 left-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00]">
@@ -298,14 +435,18 @@ export default function GroupsPage() {
                       </span>
                     </div>
 
-                    {/* Schedule Bar */}
+                    {/* Schedule Bar with accurate calendar days */}
                     <div className="flex items-center justify-between text-[9px] text-zinc-400">
                       <span className="text-zinc-400">
                         ROSTER: <strong className="text-zinc-300">{members.length} ORANG</strong>
                       </span>
-                      <span className="flex items-center gap-1 text-[#DFFF00]">
+                      <span
+                        className={`flex items-center gap-1 font-bold ${
+                          dueInfo.isUrgent ? "text-[#FF4F00]" : "text-[#DFFF00]"
+                        }`}
+                      >
                         <Calendar className="w-3 h-3" />
-                        TGL {group.billing_day} ({dueLabel})
+                        TGL {group.billing_day} ({dueInfo.label})
                       </span>
                     </div>
                   </div>
@@ -324,13 +465,13 @@ export default function GroupsPage() {
         </div>
       )}
 
-      {/* Industrial Apparatus Initializer Modal (Solid Opaque, Zero Backdrop Blur) */}
+      {/* Industrial Apparatus Initializer Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-3 sm:p-4">
           <div className="bg-[#111214] border-2 border-[#26282B] w-full max-w-lg p-4 sm:p-5 space-y-3.5 max-h-[92vh] overflow-y-auto bracket-frame">
             <div className="flex items-center justify-between border-b border-[#26282B] pb-2 text-xs">
               <span className="text-[#FF4F00] font-bold text-sm">
-                [ RACK_INITIALIZER // FORM_REGISTRASI ]
+                [ RACK_INITIALIZER // REGISTRASI_CLUSTER ]
               </span>
               <button
                 onClick={() => setShowModal(false)}
@@ -340,15 +481,16 @@ export default function GroupsPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
+              {/* Nama Grup & Layanan */}
               <div>
                 <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                  NAMA GRUP / CLUSTER PATUNGAN *
+                  NAMA CLUSTER PATUNGAN *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Netflix Kosan Tembalang"
+                  placeholder="e.g. Netflix Kosan Bareng"
                   value={groupName}
                   onChange={(e) => setGroupName(e.target.value)}
                   className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
@@ -375,11 +517,9 @@ export default function GroupsPage() {
                         key={s.id}
                         onClick={() => {
                           setServiceName(s.name);
-                          setPricePerPerson(
-                            Math.round(s.monthly_price / (s.max_slots || 1)).toString()
-                          );
+                          setTotalPrice(s.monthly_price.toString());
                         }}
-                        className="text-[9px] px-2 py-0.5 bg-[#0E0F11] border border-zinc-800 text-zinc-300 lg:hover:text-white shrink-0"
+                        className="text-[9px] px-2 py-0.5 bg-[#0E0F11] border border-zinc-800 text-zinc-300 lg:hover:text-white shrink-0 active:bg-zinc-800"
                       >
                         + {s.name}
                       </button>
@@ -388,10 +528,11 @@ export default function GroupsPage() {
                 )}
               </div>
 
+              {/* Data PJ (Leader) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    NAMA PENANGGUNG JAWAB (PJ) *
+                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1 flex items-center gap-1">
+                    <User className="w-3 h-3 text-[#FF4F00]" /> PENANGGUNG JAWAB (PJ) *
                   </label>
                   <input
                     type="text"
@@ -401,43 +542,74 @@ export default function GroupsPage() {
                     onChange={(e) => setLeaderName(e.target.value)}
                     className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
                   />
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      id="leaderInc"
+                      checked={leaderIncluded}
+                      onChange={(e) => setLeaderIncluded(e.target.checked)}
+                      className="accent-[#FF4F00] cursor-pointer"
+                    />
+                    <label htmlFor="leaderInc" className="text-[9px] text-zinc-400 cursor-pointer">
+                      PJ ikut langganan (masuk daftar patungan)
+                    </label>
+                  </div>
                 </div>
+
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    NO. WHATSAPP PJ *
+                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1 flex items-center gap-1">
+                    <Phone className="w-3 h-3 text-[#00E676]" /> NO. WHATSAPP PJ (WAJIB 628xxx) *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="62812345678"
+                    placeholder="6281234567890"
                     value={leaderPhone}
-                    onChange={(e) => setLeaderPhone(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    onChange={handlePhoneChange}
+                    className={`w-full bg-[#0E0F11] border px-3 py-1.5 text-white focus:outline-none ${
+                      phoneError ? "border-rose-500" : "border-[#26282B] focus:border-[#FF4F00]"
+                    }`}
                   />
+                  {phoneError ? (
+                    <span className="text-[9px] text-rose-400 block mt-0.5">
+                      {phoneError}
+                    </span>
+                  ) : (
+                    <span className="text-[9px] text-zinc-500 block mt-0.5">
+                      Otomatis distandarisasi ke format 628xxx
+                    </span>
+                  )}
                 </div>
               </div>
 
+              {/* Total Tarif Langganan Bulanan & Tanggal Jatuh Tempo */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                 <div>
                   <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    TARIF / ORANG (RP)
+                    TOTAL BIAYA RESMI BULANAN (RP) *
                   </label>
                   <input
                     type="number"
-                    placeholder="46500"
-                    value={pricePerPerson}
-                    onChange={(e) => setPricePerPerson(e.target.value)}
+                    required
+                    placeholder="186000"
+                    value={totalPrice}
+                    onChange={(e) => setTotalPrice(e.target.value)}
                     className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
                   />
+                  <span className="text-[9px] text-zinc-500 block mt-0.5">
+                    Web otomatis membagi rata ke anggota
+                  </span>
                 </div>
+
                 <div>
                   <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    TGL JATUH TEMPO (1-31)
+                    TGL JATUH TEMPO SETIAP BULAN (1-31) *
                   </label>
                   <input
                     type="number"
                     min="1"
                     max="31"
+                    required
                     value={billingDay}
                     onChange={(e) => setBillingDay(e.target.value)}
                     className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
@@ -445,23 +617,107 @@ export default function GroupsPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                  ROSTER ANGGOTA (PISAHKAN DENGAN KOMA)
-                </label>
-                <input
-                  type="text"
-                  placeholder="Budi, Andi, Siti, Rizky"
-                  value={memberList}
-                  onChange={(e) => setMemberList(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
-                />
+              {/* Enhanced Member Tag / Chip Editor */}
+              <div className="border border-[#26282B] bg-[#0E0F11] p-3 space-y-2">
+                <div className="flex justify-between items-center text-[10px] uppercase text-zinc-400">
+                  <span className="font-bold text-white flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5 text-[#FF4F00]" /> DAFTAR ANGGOTA ROSTER ({activeRoster.length} ORANG)
+                  </span>
+                  <span className="text-[#DFFF00]">TEKAN ENTER / TAMBAH</span>
+                </div>
+
+                {/* Chips Container */}
+                <div className="flex flex-wrap gap-1.5 min-h-[36px] p-2 bg-[#141517] border border-[#26282B]">
+                  {leaderIncluded && leaderName.trim() && (
+                    <div className="px-2 py-0.5 bg-[#FF4F00]/20 border border-[#FF4F00] text-[#FF4F00] text-[10px] flex items-center gap-1.5">
+                      <span className="font-bold">[PJ] {leaderName.trim()}</span>
+                      <button
+                        type="button"
+                        onClick={() => setLeaderIncluded(false)}
+                        className="text-zinc-400 hover:text-white"
+                        title="Keluarkan PJ dari daftar patungan"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  )}
+
+                  {memberChips.map((m, idx) => (
+                    <div
+                      key={idx}
+                      className="px-2 py-0.5 bg-zinc-900 border border-zinc-700 text-zinc-200 text-[10px] flex items-center gap-1.5"
+                    >
+                      <span>{m}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveMemberChip(m)}
+                        className="text-zinc-500 hover:text-rose-400"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {activeRoster.length === 0 && (
+                    <span className="text-[10px] text-zinc-600 self-center">
+                      Belum ada anggota. Masukkan nama teman di bawah.
+                    </span>
+                  )}
+                </div>
+
+                {/* Input new member */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Ketik nama anggota (e.g. Andi Pratama)..."
+                    value={newMemberInput}
+                    onChange={(e) => setNewMemberInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === ",") {
+                        e.preventDefault();
+                        handleAddMemberChip();
+                      }
+                    }}
+                    className="flex-1 bg-[#111214] border border-[#26282B] px-3 py-1.5 text-white placeholder-zinc-600 focus:outline-none focus:border-[#FF4F00] text-[10px]"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddMemberChip}
+                    className="px-3 py-1.5 bg-zinc-800 hover:bg-[#FF4F00] hover:text-black border border-zinc-700 text-zinc-200 text-[10px] uppercase font-bold shrink-0 transition-colors"
+                  >
+                    + TAMBAH
+                  </button>
+                </div>
+              </div>
+
+              {/* Dynamic Telemetry Calculation Display */}
+              <div className="lcd-screen p-3 border border-zinc-800 space-y-1.5 select-none">
+                <div className="flex justify-between items-center text-[10px]">
+                  <span className="text-zinc-400">TOTAL BIAYA BULANAN:</span>
+                  <span className="text-white font-bold tabular-nums">
+                    {formatRupiah(Number(totalPrice) || 0)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-[10px]">
+                  <span className="text-zinc-400">JUMLAH ANGGOTA:</span>
+                  <span className="text-[#DFFF00] font-bold tabular-nums">
+                    {activeRoster.length} ORANG
+                  </span>
+                </div>
+                <div className="pt-1.5 border-t border-dashed border-zinc-800 flex justify-between items-center">
+                  <span className="text-[10px] text-zinc-400 uppercase font-bold">
+                    TARIF OTOMATIS PER KEPALA:
+                  </span>
+                  <span className="text-sm font-bold text-[#00E676] tabular-nums">
+                    {formatRupiah(calculatedPricePerPerson)} / bln
+                  </span>
+                </div>
               </div>
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 bg-[#FF4F00] lg:hover:bg-[#ff651c] disabled:bg-zinc-800 text-black font-bold uppercase tracking-wider text-xs transition-colors mt-2 active:bg-[#ff651c]"
+                className="w-full py-3 bg-[#FF4F00] lg:hover:bg-[#ff651c] disabled:bg-zinc-800 text-black font-bold uppercase tracking-wider text-xs transition-colors mt-2 active:bg-[#ff651c] shadow-lg"
               >
                 {submitting ? "RECORDING_RACK..." : "[ COMMIT_NEW_GROUP ]"}
               </button>

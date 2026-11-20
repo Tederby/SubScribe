@@ -25,7 +25,7 @@ export const groupController = {
 
   async create(req, res) {
     try {
-      const { group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list } = req.body;
+      const { group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members } = req.body;
       if (!group_name || !service_name || !leader_name || !leader_phone) {
         return res.status(400).json({
           success: false,
@@ -39,7 +39,8 @@ export const groupController = {
         leader_phone,
         price_per_person: price_per_person !== undefined ? Number(price_per_person) : 0,
         billing_day: billing_day !== undefined ? parseInt(billing_day, 10) : 1,
-        member_list: member_list || ""
+        member_list: member_list || "",
+        paid_members: paid_members || leader_name
       };
       const data = await groupModel.create(payload);
       return res.status(201).json({ success: true, data });
@@ -51,7 +52,7 @@ export const groupController = {
   async update(req, res) {
     try {
       const { id } = req.params;
-      const { group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list } = req.body;
+      const { group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members } = req.body;
       const payload = {};
       if (group_name !== undefined) payload.group_name = group_name;
       if (service_name !== undefined) payload.service_name = service_name;
@@ -60,6 +61,7 @@ export const groupController = {
       if (price_per_person !== undefined) payload.price_per_person = Number(price_per_person);
       if (billing_day !== undefined) payload.billing_day = parseInt(billing_day, 10);
       if (member_list !== undefined) payload.member_list = member_list;
+      if (paid_members !== undefined) payload.paid_members = paid_members;
 
       const data = await groupModel.update(id, payload);
       if (!data) {

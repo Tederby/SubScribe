@@ -24,10 +24,11 @@ create table if not exists split_groups (
   group_name text not null,
   service_name text not null,
   leader_name text not null,
-  leader_phone text not null,
+  leader_phone text not null, -- Format baku Indonesia: 628xxx
   price_per_person numeric(12,2) default 0,
   billing_day integer default 1,
-  member_list text -- Comma-separated names, e.g. "Budi, Andi, Siti"
+  member_list text, -- Comma-separated names, e.g. "Budi, Andi, Siti"
+  paid_members text default '' -- Comma-separated paid members for cycle tracking
 );
 
 -- 4. Initial Seed Data (Indonesian Digital Subscriptions)
@@ -35,16 +36,18 @@ create table if not exists split_groups (
 insert into categories (id, name) values
   ('c1111111-1111-1111-1111-111111111111', 'Video Streaming'),
   ('c2222222-2222-2222-2222-222222222222', 'Musik'),
-  ('c3333333-3333-3333-3333-333333333333', 'Produktivitas AI')
+  ('c3333333-3333-3333-3333-333333333333', 'Produktivitas AI'),
+  ('c4444444-4444-4444-4444-444444444444', 'Cloud & Storage'),
+  ('c5555555-5555-5555-5555-555555555555', 'Gaming & Edukasi')
 on conflict (id) do nothing;
 
--- Insert Services
+-- Insert Services (Expanded Realistic Catalog)
 insert into services (id, sku, name, description, category_id, monthly_price, max_slots) values
   (
     's1111111-1111-1111-1111-111111111111',
     'NETFLIX-PREM',
     'Netflix Premium',
-    'Paket langganan 4K Ultra HD dengan akses simultan 4 layar.',
+    'Paket langganan 4K Ultra HD + HDR dengan akses simultan 4 layar dan profil mandiri.',
     'c1111111-1111-1111-1111-111111111111',
     186000.00,
     4
@@ -53,7 +56,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     's2222222-2222-2222-2222-222222222222',
     'SPOTIFY-FAM',
     'Spotify Family',
-    'Paket musik tanpa iklan untuk hingga 6 akun keluarga.',
+    'Paket musik lossless bebas iklan untuk hingga 6 akun keluarga terpisah.',
     'c2222222-2222-2222-2222-222222222222',
     86900.00,
     6
@@ -62,7 +65,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     's3333333-3333-3333-3333-333333333333',
     'YOUTUBE-FAM',
     'YouTube Premium Family',
-    'Bebas iklan, putar di latar belakang, dan YouTube Music untuk 5 anggota.',
+    'Bebas iklan, putar di latar belakang, dan YouTube Music Premium untuk 5 anggota.',
     'c1111111-1111-1111-1111-111111111111',
     139000.00,
     5
@@ -71,34 +74,108 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     's4444444-4444-4444-4444-444444444444',
     'CHATGPT-PLUS',
     'ChatGPT Plus Team',
-    'Akses GPT-4o, pembuatan gambar DALL-E, dan canvas kolaboratif.',
+    'Akses GPT-4o tanpa batas, DALL-E 3, pembuatan custom GPTs, dan workspace kolaboratif.',
     'c3333333-3333-3333-3333-333333333333',
     300000.00,
+    3
+  ),
+  (
+    's5555555-5555-5555-5555-555555555555',
+    'DISNEY-PREM',
+    'Disney+ Hotstar Premium',
+    'Streaming 4K Ultra HD film Marvel, Disney, Pixar, dan serial lokal hingga 3 layar aktif.',
+    'c1111111-1111-1111-1111-111111111111',
+    119000.00,
+    3
+  ),
+  (
+    's6666666-6666-6666-6666-666666666666',
+    'CANVA-TEAM',
+    'Canva Pro Team',
+    'Desain profesional kolaboratif, Brand Kit premium, Magic Switch AI untuk 5 seat.',
+    'c3333333-3333-3333-3333-333333333333',
+    124000.00,
+    5
+  ),
+  (
+    's7777777-7777-7777-7777-777777777777',
+    'APPLE-ONE-PREM',
+    'Apple One Premier',
+    'Apple Music, Apple TV+, Apple Arcade, dan iCloud+ 2TB berbagi hingga 6 anggota.',
+    'c4444444-4444-4444-4444-444444444444',
+    159000.00,
+    6
+  ),
+  (
+    's8888888-8888-8888-8888-888888888888',
+    'GOOGLE-ONE-2TB',
+    'Google One 2TB Family',
+    'Penyimpanan cloud Google Photos dan Drive bersama 5 anggota keluarga + Gemini Advanced.',
+    'c4444444-4444-4444-4444-444444444444',
+    135000.00,
+    5
+  ),
+  (
+    's9999999-9999-9999-9999-999999999999',
+    'PRIME-VIDEO',
+    'Amazon Prime Video',
+    'Serial original The Boys, Rings of Power, resolusi 4K HDR dengan 3 layar simultan.',
+    'c1111111-1111-1111-1111-111111111111',
+    59000.00,
+    3
+  ),
+  (
+    'saaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    'NINTENDO-FAM',
+    'Nintendo Switch Online Family',
+    'Akses multiplayer online Nintendo Switch, cloud save, dan katalog retro game 8 akun.',
+    'c5555555-5555-5555-5555-555555555555',
+    65000.00,
+    8
+  ),
+  (
+    'sbbbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    'DUOLINGO-FAM',
+    'Duolingo Super Family',
+    'Belajar bahasa bebas iklan, nyawa tanpa batas, dan Family Quest untuk 6 anggota.',
+    'c5555555-5555-5555-5555-555555555555',
+    149000.00,
+    6
+  ),
+  (
+    'sccccccccc-cccc-cccc-cccc-cccccccccccc',
+    'MIDJOURNEY-STD',
+    'Midjourney Standard',
+    'Akses fast GPU generation 15 jam/bulan, relax GPU unlimited, dan shared gallery 3 seat.',
+    'c3333333-3333-3333-3333-333333333333',
+    450000.00,
     3
   )
 on conflict (sku) do nothing;
 
 -- Insert Sample Split Groups
-insert into split_groups (id, group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list) values
+insert into split_groups (id, group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members) values
   (
     'g1111111-1111-1111-1111-111111111111',
-    'Netflix Nonton Bareng',
+    'Netflix Nonton Bareng Kos',
     'Netflix Premium',
     'Budi Santoso',
     '6281234567890',
     46500.00,
     15,
-    'Budi, Andi, Siti, Rizky'
+    'Budi Santoso, Andi Pratama, Siti Nurhaliza, Rizky Ramadhan',
+    'Budi Santoso, Andi Pratama'
   ),
   (
     'g2222222-2222-2222-2222-222222222222',
-    'Spotify Musikan',
+    'Spotify Musikan Circle',
     'Spotify Family',
     'Citra Dewi',
     '6289876543210',
     14500.00,
     1,
-    'Citra, Eko, Fajar, Gita, Hana, Ian'
+    'Citra Dewi, Eko Nugroho, Fajar Setiawan, Gita Savitri, Hana Pratiwi, Ian Kasela',
+    'Citra Dewi, Eko Nugroho, Fajar Setiawan'
   )
 on conflict (id) do nothing;
 

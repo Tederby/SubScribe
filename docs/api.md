@@ -40,9 +40,10 @@ Base URL: `http://localhost:3000` (Local) / `/api` (Production)
     "leader_phone": "6281234567890",
     "price_per_person": 46500,
     "billing_day": 15,
-    "member_list": "Budi, Andi, Siti, Rizky"
+    "member_list": "Budi Santoso, Andi Pratama, Siti Nurhaliza, Rizky Ramadhan",
+    "paid_members": "Budi Santoso, Andi Pratama"
   }
   ```
-- `PUT /api/groups/:id` - Update group by UUID.
+- `PUT /api/groups/:id` - Update group by UUID (accepts any fields including `paid_members` and `member_list`).
 - `DELETE /api/groups/:id` - Delete group by UUID.
 

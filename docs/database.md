@@ -31,10 +31,11 @@ Engine: Supabase PostgreSQL (defined in `schema.sql`).
 │ group_name (TEXT)    │
 │ service_name (TEXT)  │
 │ leader_name (TEXT)   │
-│ leader_phone (TEXT)  │
+│ leader_phone (TEXT)  │  (format: 628xxx)
 │ price_per_person(NUM)│
 │ billing_day (INT)    │
 │ member_list (TEXT)   │
+│ paid_members (TEXT)  │  (comma-separated checklist status)
 └──────────────────────┘
 ```
 
