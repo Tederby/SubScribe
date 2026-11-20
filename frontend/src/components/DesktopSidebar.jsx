@@ -97,7 +97,7 @@ export default function DesktopSidebar() {
     <aside className="hidden lg:flex flex-col w-64 xl:w-72 border-r border-[#26282B] bg-[#0E0F11] p-3.5 space-y-4 shrink-0 select-none">
       {/* Station Brand Panel */}
       <div className="border border-[#26282B] bg-[#111214] p-3 space-y-2 bracket-frame">
-        <div className="flex items-center justify-between text-[8px] font-mono uppercase text-zinc-500 border-b border-zinc-800 pb-1.5">
+        <div className="flex items-center justify-between text-[9px] font-mono uppercase text-zinc-400 border-b border-zinc-800 pb-1.5">
           <span className="flex items-center gap-1.5 text-[#00E676] font-bold">
             <span className="w-1.5 h-1.5 rounded-full bg-[#00E676] ring-1 ring-[#00E676]/50" />
             STATION // ALPHA-01
@@ -122,7 +122,7 @@ export default function DesktopSidebar() {
 
       {/* Navigation Modules */}
       <div className="space-y-1.5 flex-1">
-        <div className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest px-1">
+        <div className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest px-1">
           // MASTER_MODULES
         </div>
 
@@ -159,7 +159,7 @@ export default function DesktopSidebar() {
 
                       <Icon
                         className={`w-4 h-4 transition-colors ${
-                          isActive ? "text-[#FF4F00]" : "text-zinc-500 group-hover:text-zinc-300"
+                          isActive ? "text-[#FF4F00]" : "text-zinc-400 group-hover:text-zinc-300"
                         }`}
                       />
 
@@ -167,7 +167,7 @@ export default function DesktopSidebar() {
                         <div className="text-[11px] font-mono font-bold tracking-wider truncate">
                           {item.label}
                         </div>
-                        <div className="text-[8px] font-mono text-zinc-500 truncate">
+                        <div className="text-[9px] font-mono text-zinc-400 truncate">
                           {item.sub}
                         </div>
                       </div>
@@ -179,7 +179,7 @@ export default function DesktopSidebar() {
                           {item.count}
                         </span>
                       )}
-                      <span className="text-[8px] font-mono text-zinc-600 px-1 border border-zinc-800">
+                      <span className="text-[9px] font-mono text-zinc-400 px-1 border border-zinc-700">
                         [{item.shortcut}]
                       </span>
                     </div>
@@ -193,26 +193,26 @@ export default function DesktopSidebar() {
 
       {/* Hardware Telemetry Deck */}
       <div className="border border-[#26282B] bg-[#111214] p-3 space-y-2">
-        <div className="text-[8px] font-mono text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-1 flex items-center justify-between">
+        <div className="text-[9px] font-mono text-zinc-400 uppercase tracking-widest border-b border-zinc-800 pb-1 flex items-center justify-between">
           <span>// DESKTOP_TELEMETRY</span>
           <Activity className="w-3 h-3 text-[#00E676]" />
         </div>
 
         <div className="space-y-1.5 text-[9px] font-mono">
           <div className="flex justify-between items-center text-zinc-400">
-            <span className="text-zinc-500">CACHE_STORAGE:</span>
+            <span className="text-zinc-400">CACHE_STORAGE:</span>
             <span className="text-zinc-200 tabular-nums">{cacheKb} KB</span>
           </div>
 
           <div className="flex justify-between items-center text-zinc-400">
-            <span className="text-zinc-500">POOLED_MEMBERS:</span>
+            <span className="text-zinc-400">POOLED_MEMBERS:</span>
             <span className="text-[#DFFF00] font-bold tabular-nums">
               {stats.members} HEADS
             </span>
           </div>
 
           <div className="flex justify-between items-center text-zinc-400">
-            <span className="text-zinc-500">HOTKEYS:</span>
+            <span className="text-zinc-400">HOTKEYS:</span>
             <span className="text-zinc-300">PRESS 1, 2, 3</span>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default function DesktopSidebar() {
       </div>
 
       {/* Operator Credential Footer */}
-      <div className="text-[8px] font-mono text-zinc-600 border-t border-zinc-800 pt-2 flex items-center justify-between">
+      <div className="text-[9px] font-mono text-zinc-400 border-t border-zinc-800 pt-2 flex items-center justify-between">
         <span>TEKNIK KOMPUTER UNDIP</span>
         <span>2024</span>
       </div>

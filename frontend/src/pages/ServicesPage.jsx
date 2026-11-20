@@ -93,19 +93,19 @@ export default function ServicesPage() {
         {/* Global Catalog KPI Deck (Responsive: 3 columns) */}
         <div className="mt-3.5 pt-3 border-t border-dashed border-zinc-800 grid grid-cols-3 gap-1.5 sm:gap-3 text-center select-none">
           <div className="bg-[#0E0F11] border border-[#26282B] py-2 px-1.5">
-            <div className="text-[8px] sm:text-[9px] text-zinc-500 uppercase">INDEXED_UNITS</div>
+            <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase">INDEXED_UNITS</div>
             <div className="text-xs sm:text-sm font-bold text-white tabular-nums mt-0.5">
               {services.length} UNITS
             </div>
           </div>
           <div className="bg-[#0E0F11] border border-[#26282B] py-2 px-1.5">
-            <div className="text-[8px] sm:text-[9px] text-zinc-500 uppercase">CATEGORIES</div>
+            <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase">CATEGORIES</div>
             <div className="text-xs sm:text-sm font-bold text-[#DFFF00] tabular-nums mt-0.5">
               {categories.length} SECTORS
             </div>
           </div>
           <div className="bg-[#0E0F11] border border-[#26282B] py-2 px-1.5">
-            <div className="text-[8px] sm:text-[9px] text-zinc-500 uppercase">ENTRY_SPLIT</div>
+            <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase">ENTRY_SPLIT</div>
             <div className="text-xs sm:text-sm font-bold text-[#00E676] tabular-nums mt-0.5">
               {lowestSplitPrice > 0 ? formatRupiah(lowestSplitPrice) : "Rp 0"}
             </div>
@@ -118,7 +118,7 @@ export default function ServicesPage() {
         <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
           {/* Radar Search Input */}
           <div className="relative flex-1">
-            <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-500">
+            <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-400">
               <Search className="w-3.5 h-3.5 text-zinc-400" />
             </div>
             <input
@@ -126,19 +126,19 @@ export default function ServicesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="RADAR SCAN // CARI NAMA ATAU SKU LAYANAN..."
-              className="w-full bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] pl-8 pr-8 py-2 text-xs text-white placeholder-zinc-600 focus:outline-none"
+              className="w-full bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] pl-8 pr-8 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-zinc-500 hover:text-white"
+                className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-zinc-400 hover:text-white"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
-          <div className="text-[9px] text-zinc-500 uppercase tracking-widest hidden sm:block shrink-0">
+          <div className="text-[9px] text-zinc-400 uppercase tracking-widest hidden sm:block shrink-0">
             FILTERED: {filteredServices.length} / {services.length}
           </div>
         </div>
@@ -233,11 +233,11 @@ export default function ServicesPage() {
                       <div className="text-xs sm:text-sm font-bold text-[#00E676] tabular-nums">
                         {formatRupiah(service.monthly_price)}
                       </div>
-                      <div className="text-[8px] text-zinc-500 uppercase">/ BULAN TOTAL</div>
+                      <div className="text-[9px] text-zinc-400 uppercase">/ BULAN TOTAL</div>
                     </div>
                   </div>
 
-                  <p className="text-[10px] text-zinc-400 font-sans mt-2 line-clamp-2 leading-relaxed">
+                  <p className="text-[10px] sm:text-[11px] text-zinc-400 font-sans mt-2 line-clamp-2 leading-relaxed">
                     {service.description || "Layanan langganan digital dengan dukungan multi-screen profile."}
                   </p>
                 </div>
@@ -245,11 +245,11 @@ export default function ServicesPage() {
                 {/* Card Telemetry Footer */}
                 <div className="mt-3 pt-2.5 border-t border-dashed border-zinc-800 flex items-center justify-between text-[10px]">
                   <div className="text-zinc-400">
-                    <span className="text-zinc-500">EST. SPLIT: </span>
+                    <span className="text-zinc-400">EST. SPLIT: </span>
                     <strong className="text-[#DFFF00] tabular-nums">
                       {formatRupiah(minPerSlot)}
                     </strong>
-                    <span className="text-zinc-500 text-[8px]"> /SLOT ({service.max_slots} MAX)</span>
+                    <span className="text-zinc-400 text-[9px]"> /SLOT ({service.max_slots} MAX)</span>
                   </div>
 
                   <span className="flex items-center text-[#FF4F00] font-bold text-[9px] lg:group-hover:translate-x-1 transition-transform">

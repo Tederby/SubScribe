@@ -205,23 +205,23 @@ export default function ProfilePage() {
 
             <div className="pt-2 border-t border-dashed border-zinc-800 grid grid-cols-2 gap-2 text-[9px] text-zinc-400 select-none">
               <div className="bg-[#0E0F11] border border-[#26282B] p-2">
-                <span className="text-zinc-500 block">BUILD_REV</span>
+                <span className="text-zinc-400 block">BUILD_REV</span>
                 <span className="text-zinc-200 font-bold">v1.2.0-utilitarian</span>
               </div>
               <div className="bg-[#0E0F11] border border-[#26282B] p-2">
-                <span className="text-zinc-500 block">ENVIRONMENT</span>
+                <span className="text-zinc-400 block">ENVIRONMENT</span>
                 <span className="text-[#DFFF00] font-bold">
                   {isStandalone ? "STANDALONE_APK" : "DESKTOP_PWA"}
                 </span>
               </div>
               <div className="bg-[#0E0F11] border border-[#26282B] p-2">
-                <span className="text-zinc-500 block">CACHE_STORAGE</span>
+                <span className="text-zinc-400 block">CACHE_STORAGE</span>
                 <span className="text-zinc-200 font-bold tabular-nums">
                   {(storageBytes / 1024).toFixed(1)} KB INDEXED
                 </span>
               </div>
               <div className="bg-[#0E0F11] border border-[#26282B] p-2">
-                <span className="text-zinc-500 block">NETWORK_MODE</span>
+                <span className="text-zinc-400 block">NETWORK_MODE</span>
                 <span className="text-[#00E676] font-bold">
                   {navigator.onLine ? "ONLINE_ACTIVE" : "OFFLINE_STANDBY"}
                 </span>
@@ -240,22 +240,22 @@ export default function ProfilePage() {
 
             <div className="space-y-1.5 text-[11px]">
               <div className="flex justify-between items-center py-1 border-b border-dashed border-zinc-900">
-                <span className="text-zinc-500">OPERATOR:</span>
+                <span className="text-zinc-400">OPERATOR:</span>
                 <span className="text-white font-bold font-sans">Muhammad Afiffatin Hariz</span>
               </div>
 
               <div className="flex justify-between items-center py-1 border-b border-dashed border-zinc-900">
-                <span className="text-zinc-500">STUDENT_NIM:</span>
+                <span className="text-zinc-400">STUDENT_NIM:</span>
                 <span className="text-zinc-200 font-mono">21120124130073</span>
               </div>
 
               <div className="flex justify-between items-center py-1 border-b border-dashed border-zinc-900">
-                <span className="text-zinc-500">DEPARTMENT:</span>
+                <span className="text-zinc-400">DEPARTMENT:</span>
                 <span className="text-zinc-200">Teknik Komputer Undip 2024</span>
               </div>
 
               <div className="flex justify-between items-center py-1">
-                <span className="text-zinc-500">SOURCE_HUB:</span>
+                <span className="text-zinc-400">SOURCE_HUB:</span>
                 <a
                   href="https://github.com"
                   target="_blank"
@@ -332,7 +332,7 @@ export default function ProfilePage() {
                 <span className="text-[11px] font-bold text-white uppercase tracking-wider block">
                   [ REGISTRY_ADMIN_APPARATUS ]
                 </span>
-                <span className="text-[9px] text-zinc-500">
+                <span className="text-[9px] text-zinc-400">
                   Uji integrasi REST API backend atau tambah dataset langsung ke katalog.
                 </span>
               </div>
@@ -409,7 +409,7 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[9px] uppercase text-zinc-500 mb-1">SKU *</label>
+                    <label className="block text-[9px] uppercase text-zinc-400 mb-1">SKU *</label>
                     <input
                       type="text"
                       required
@@ -420,7 +420,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[9px] uppercase text-zinc-500 mb-1">KATEGORI *</label>
+                    <label className="block text-[9px] uppercase text-zinc-400 mb-1">KATEGORI *</label>
                     <select
                       value={serviceCatId}
                       onChange={(e) => setServiceCatId(e.target.value)}
@@ -436,7 +436,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[9px] uppercase text-zinc-500 mb-1">NAMA LAYANAN *</label>
+                  <label className="block text-[9px] uppercase text-zinc-400 mb-1">NAMA LAYANAN *</label>
                   <input
                     type="text"
                     required
@@ -448,7 +448,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-[9px] uppercase text-zinc-500 mb-1">DESKRIPSI FITUR</label>
+                  <label className="block text-[9px] uppercase text-zinc-400 mb-1">DESKRIPSI FITUR</label>
                   <input
                     type="text"
                     placeholder="iCloud 2TB, Apple Music, TV+ 5 orang"
@@ -460,7 +460,7 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[9px] uppercase text-zinc-500 mb-1">HARGA / BULAN (RP) *</label>
+                    <label className="block text-[9px] uppercase text-zinc-400 mb-1">HARGA / BULAN (RP) *</label>
                     <input
                       type="number"
                       required
@@ -471,7 +471,7 @@ export default function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-[9px] uppercase text-zinc-500 mb-1">MAX SLOTS *</label>
+                    <label className="block text-[9px] uppercase text-zinc-400 mb-1">MAX SLOTS *</label>
                     <input
                       type="number"
                       min="1"

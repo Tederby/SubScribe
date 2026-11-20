@@ -38,7 +38,7 @@ export default function App() {
   return (
     <div className="w-full max-w-md lg:max-w-7xl xl:max-w-[1400px] mx-auto min-h-screen bg-[#141517] text-[#E5E5E0] relative border-x lg:border border-[#26282B] lg:shadow-2xl flex flex-col pt-[env(safe-area-inset-top,0px)] lg:my-3">
       {/* Top Apparatus Telemetry Header (Solid Opaque, Zero Backdrop Blur for 60/120 FPS scrolling) */}
-      <header className="px-3.5 py-2 border-b border-[#26282B] bg-[#0E0F11] flex items-center justify-between font-mono text-[9px] uppercase tracking-wider text-zinc-400 select-none sticky top-0 z-40">
+      <header className="px-3.5 py-2 border-b border-[#26282B] bg-[#0E0F11] flex items-center justify-between font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-300 select-none sticky top-0 z-40">
         <div className="flex items-center gap-2">
           <span
             className={`w-1.5 h-1.5 rounded-full ring-1 ${
@@ -49,17 +49,17 @@ export default function App() {
           <span className="text-zinc-600">|</span>
           <TelemetryClock />
           <span className="hidden md:inline text-zinc-600">|</span>
-          <span className="hidden md:inline text-zinc-500">APPARATUS_CONTROL_DESK</span>
+          <span className="hidden md:inline text-zinc-400">APPARATUS_CONTROL_DESK</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="hidden sm:inline text-zinc-500">SPEC_REV 2.04</span>
+          <span className="hidden sm:inline text-zinc-400">SPEC_REV 2.04</span>
           <span className="hidden lg:inline text-zinc-600">|</span>
           <span className="hidden lg:inline text-[#FF4F00] font-bold">
             {getRouteCode()}
           </span>
           <span
-            className={`px-1.5 py-0.5 border text-[8px] font-bold tracking-widest ${
+            className={`px-1.5 py-0.5 border text-[9px] font-bold tracking-widest ${
               isOnline
                 ? "bg-zinc-900 border-[#00E676]/60 text-[#00E676]"
                 : "bg-zinc-900 border-[#FF4F00]/60 text-[#FF4F00]"
@@ -71,9 +71,9 @@ export default function App() {
       </header>
 
       {/* Secondary Location Telemetry Strip (Mobile only) */}
-      <div className="lg:hidden px-3.5 py-1 bg-[#111214] border-b border-[#26282B] flex items-center justify-between font-mono text-[8px] text-zinc-500 uppercase tracking-widest select-none">
+      <div className="lg:hidden px-3.5 py-1 bg-[#111214] border-b border-[#26282B] flex items-center justify-between font-mono text-[9px] text-zinc-400 uppercase tracking-widest select-none">
         <span className="text-[#FF4F00]">{getRouteCode()}</span>
-        <span className="text-zinc-600">[ FIELD_TERMINAL ]</span>
+        <span className="text-zinc-400">[ FIELD_TERMINAL ]</span>
       </div>
 
       {/* Main Workstation Container (Sidebar + Content) */}

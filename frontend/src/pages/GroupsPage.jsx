@@ -154,38 +154,38 @@ export default function GroupsPage() {
         <div className="mt-3.5 pt-3 border-t border-dashed border-zinc-800 grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 select-none">
           <div className="bg-[#0E0F11] border border-[#26282B] p-2.5 flex items-center justify-between">
             <div>
-              <div className="text-[8px] sm:text-[9px] text-zinc-500 uppercase flex items-center gap-1">
+              <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase flex items-center gap-1">
                 <Users className="w-3 h-3 text-[#FF4F00]" /> ANGGOTA TERKELOLA
               </div>
               <div className="text-xs sm:text-sm font-bold text-white tabular-nums mt-0.5">
                 {telemetry.totalMembers} HEADS
               </div>
             </div>
-            <div className="text-[9px] text-zinc-600 font-mono">POOLED</div>
+            <div className="text-[9px] text-zinc-400 font-mono">POOLED</div>
           </div>
 
           <div className="bg-[#0E0F11] border border-[#26282B] p-2.5 flex items-center justify-between">
             <div>
-              <div className="text-[8px] sm:text-[9px] text-zinc-500 uppercase flex items-center gap-1">
+              <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase flex items-center gap-1">
                 <Wallet className="w-3 h-3 text-[#00E676]" /> SIRKULASI / BULAN
               </div>
               <div className="text-xs sm:text-sm font-bold text-[#00E676] tabular-nums mt-0.5">
                 {formatRupiah(telemetry.totalMonthlyPool)}
               </div>
             </div>
-            <div className="text-[9px] text-zinc-600 font-mono">FLOW</div>
+            <div className="text-[9px] text-zinc-400 font-mono">FLOW</div>
           </div>
 
           <div className="hidden lg:flex bg-[#0E0F11] border border-[#26282B] p-2.5 items-center justify-between">
             <div>
-              <div className="text-[8px] sm:text-[9px] text-zinc-500 uppercase flex items-center gap-1">
+              <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase flex items-center gap-1">
                 <Calendar className="w-3 h-3 text-[#DFFF00]" /> JATUH TEMPO AKTIF
               </div>
               <div className="text-xs sm:text-sm font-bold text-[#DFFF00] tabular-nums mt-0.5">
                 {groups.filter((g) => Math.abs(g.billing_day - currentDay) <= 3).length} SEGERA
               </div>
             </div>
-            <div className="text-[9px] text-zinc-600 font-mono">CYCLE</div>
+            <div className="text-[9px] text-zinc-400 font-mono">CYCLE</div>
           </div>
         </div>
       </div>
@@ -198,9 +198,9 @@ export default function GroupsPage() {
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
             placeholder="FILTER CLUSTER RACK..."
-            className="flex-1 bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] px-3 py-1.5 text-xs text-white placeholder-zinc-600 focus:outline-none uppercase"
+            className="flex-1 bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none uppercase"
           />
-          <span className="text-[9px] text-zinc-500 hidden sm:inline">
+          <span className="text-[9px] text-zinc-400 hidden sm:inline">
             SHOWING: {filteredGroups.length} OF {groups.length}
           </span>
         </div>
@@ -276,7 +276,7 @@ export default function GroupsPage() {
                       <div className="text-xs sm:text-sm font-bold text-[#00E676] tabular-nums">
                         {formatRupiah(group.price_per_person)}
                       </div>
-                      <div className="text-[8px] text-zinc-500 uppercase">/ KEPALA / BLN</div>
+                      <div className="text-[9px] text-zinc-400 uppercase">/ KEPALA / BLN</div>
                     </div>
                   </div>
 
@@ -288,7 +288,7 @@ export default function GroupsPage() {
                         PJ: <strong className="text-zinc-200">{group.leader_name}</strong>
                       </span>
                       <span
-                        className={`px-1.5 py-0.2 border text-[8px] font-bold ${
+                        className={`px-1.5 py-0.5 border text-[9px] font-bold ${
                           isSettled
                             ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
                             : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
@@ -300,7 +300,7 @@ export default function GroupsPage() {
 
                     {/* Schedule Bar */}
                     <div className="flex items-center justify-between text-[9px] text-zinc-400">
-                      <span className="text-zinc-500">
+                      <span className="text-zinc-400">
                         ROSTER: <strong className="text-zinc-300">{members.length} ORANG</strong>
                       </span>
                       <span className="flex items-center gap-1 text-[#DFFF00]">
@@ -312,7 +312,7 @@ export default function GroupsPage() {
                 </div>
 
                 {/* Inspect Action Footer */}
-                <div className="mt-3 pt-2 border-t border-[#26282B] flex items-center justify-between text-[9px] text-zinc-500">
+                <div className="mt-3 pt-2 border-t border-[#26282B] flex items-center justify-between text-[9px] text-zinc-400">
                   <span>ID: {group.id.slice(0, 8)}</span>
                   <span className="flex items-center text-[#FF4F00] font-bold lg:group-hover:translate-x-1 transition-transform">
                     [ INSPECT_RACK ] <ArrowUpRight className="w-3 h-3 ml-0.5" />
@@ -379,7 +379,7 @@ export default function GroupsPage() {
                             Math.round(s.monthly_price / (s.max_slots || 1)).toString()
                           );
                         }}
-                        className="text-[8px] px-2 py-0.5 bg-[#0E0F11] border border-zinc-800 text-zinc-400 lg:hover:text-white shrink-0"
+                        className="text-[9px] px-2 py-0.5 bg-[#0E0F11] border border-zinc-800 text-zinc-300 lg:hover:text-white shrink-0"
                       >
                         + {s.name}
                       </button>

@@ -38,9 +38,9 @@ export default function ServiceDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-8 text-center font-mono text-xs text-zinc-500 space-y-2">
+      <div className="p-8 text-center font-mono text-xs text-zinc-400 space-y-2">
         <div className="animate-pulse">READING_SERVICE_TELEMETRY...</div>
-        <div className="text-[10px] text-zinc-600">SPEC_PARSER: ACTIVE</div>
+        <div className="text-[10px] text-zinc-400">SPEC_PARSER: ACTIVE</div>
       </div>
     );
   }
@@ -92,7 +92,7 @@ export default function ServiceDetailPage() {
           <ArrowLeft className="w-3.5 h-3.5" /> [ &lt; RETURN_TO_CATALOG ]
         </Link>
         <div className="flex items-center gap-2">
-          <span className="text-[10px] text-zinc-500 uppercase tracking-wider hidden sm:inline">
+          <span className="text-[10px] text-zinc-400 uppercase tracking-wider hidden sm:inline">
             SPECIFICATION_PARSER
           </span>
           <span className="text-[10px] text-[#FF4F00] font-bold">
@@ -119,11 +119,11 @@ export default function ServiceDetailPage() {
                 </h1>
               </div>
               <div className="text-right">
-                <span className="text-[8px] text-zinc-500 block uppercase">HARGA_RESMI</span>
+                <span className="text-[9px] text-zinc-400 block uppercase">HARGA_RESMI</span>
                 <span className="text-sm sm:text-base font-bold text-[#00E676] tabular-nums">
                   {formatRupiah(service.monthly_price)}
                 </span>
-                <span className="text-[8px] text-zinc-500 block">/ BULAN</span>
+                <span className="text-[9px] text-zinc-400 block">/ BULAN</span>
               </div>
             </div>
 
@@ -133,14 +133,14 @@ export default function ServiceDetailPage() {
 
             <div className="pt-2 border-t border-[#26282B] space-y-1.5 text-[10px] text-zinc-400">
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-zinc-500">
+                <span className="flex items-center gap-1.5 text-zinc-400">
                   <Cpu className="w-3.5 h-3.5 text-[#FF4F00]" /> KAPASITAS_SLOT:
                 </span>
                 <span className="font-bold text-white">{service.max_slots} PROFIL SIMULTAN</span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-zinc-500">
+                <span className="flex items-center gap-1.5 text-zinc-400">
                   <Tag className="w-3.5 h-3.5 text-[#DFFF00]" /> ESTIMASI_TAHUNAN:
                 </span>
                 <span className="text-zinc-200 tabular-nums">
@@ -149,7 +149,7 @@ export default function ServiceDetailPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-1.5 text-zinc-500">
+                <span className="flex items-center gap-1.5 text-zinc-400">
                   <Shield className="w-3.5 h-3.5 text-[#00E676]" /> KONTRAK_BILLING:
                 </span>
                 <span className="text-[#00E676] font-bold">REKUREN BULANAN</span>
@@ -158,7 +158,7 @@ export default function ServiceDetailPage() {
           </div>
 
           {/* Additional Desktop Hardware Note */}
-          <div className="hidden lg:block border border-[#26282B] bg-[#0E0F11] p-3 text-[10px] text-zinc-500 space-y-1">
+          <div className="hidden lg:block border border-[#26282B] bg-[#0E0F11] p-3 text-[10px] text-zinc-400 space-y-1">
             <div className="text-[#DFFF00] font-bold text-[9px] uppercase">// CATATAN_PATUNGAN</div>
             <p>
               Dengan membagi biaya langganan resmi bersama anggota terpercaya, setiap anggota mendapatkan akun legal mandiri tanpa melanggar ketentuan fair usage.
@@ -182,7 +182,7 @@ export default function ServiceDetailPage() {
             <div className="lcd-screen p-3.5 sm:p-4 rounded-none space-y-2.5 border border-zinc-800">
               <div className="flex justify-between items-end">
                 <div>
-                  <div className="text-[8px] sm:text-[9px] text-zinc-500 uppercase tracking-widest font-mono">
+                  <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase tracking-widest font-mono">
                     TARIF PER KEPALA / BULAN
                   </div>
                   <div className="text-xl sm:text-2xl font-bold text-[#DFFF00] tabular-nums font-mono mt-0.5">
@@ -209,7 +209,7 @@ export default function ServiceDetailPage() {
 
             {/* Partition Matrix Buttons */}
             <div className="space-y-1.5">
-              <div className="text-[9px] text-zinc-500 uppercase tracking-wider">
+              <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase tracking-wider">
                 PILIH JUMLAH ANGGOTA PARTISI:
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -223,13 +223,13 @@ export default function ServiceDetailPage() {
                         : "bg-[#0E0F11] border-[#26282B] text-zinc-300 lg:hover:border-zinc-500"
                     }`}
                   >
-                    <div className="text-[8px] uppercase tracking-wider">
+                    <div className="text-[9px] uppercase tracking-wider">
                       {opt.slots} ORANG
                     </div>
                     <div className="text-xs font-bold tabular-nums mt-0.5">
                       {formatRupiah(opt.perPerson)}
                     </div>
-                    <div className="text-[8px] text-zinc-500">/bln</div>
+                    <div className={`text-[9px] ${selectedSlots === opt.slots ? "text-black/70" : "text-zinc-400"}`}>/bln</div>
                   </button>
                 ))}
               </div>

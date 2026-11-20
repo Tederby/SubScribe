@@ -81,9 +81,9 @@ export default function GroupDetailPage() {
 
   if (loading) {
     return (
-      <div className="p-8 text-center font-mono text-xs text-zinc-500 space-y-2">
+      <div className="p-8 text-center font-mono text-xs text-zinc-400 space-y-2">
         <div className="animate-pulse">INITIALIZING_GROUP_INSPECTOR...</div>
-        <div className="text-[10px] text-zinc-600">INSPECTING_NODE</div>
+        <div className="text-[10px] text-zinc-400">INSPECTING_NODE</div>
       </div>
     );
   }
@@ -141,7 +141,7 @@ export default function GroupDetailPage() {
           >
             <ArrowLeft className="w-3.5 h-3.5" /> [ &lt; RETURN_TO_RACK ]
           </Link>
-          <span className="text-[10px] text-zinc-500 uppercase tracking-wider hidden sm:inline">
+          <span className="text-[10px] text-zinc-400 uppercase tracking-wider hidden sm:inline">
             CLUSTER_NODE // {group.id.slice(0, 8)}
           </span>
         </div>
@@ -193,11 +193,11 @@ export default function GroupDetailPage() {
                 </h1>
               </div>
               <div className="text-right">
-                <span className="text-[8px] text-zinc-500 block uppercase">TARIF / KEPALA</span>
+                <span className="text-[9px] text-zinc-400 block uppercase">TARIF / KEPALA</span>
                 <span className="text-sm sm:text-base font-bold text-[#00E676] tabular-nums">
                   {formatRupiah(group.price_per_person)}
                 </span>
-                <span className="text-[8px] text-zinc-500 block">/ BULAN</span>
+                <span className="text-[9px] text-zinc-400 block">/ BULAN</span>
               </div>
             </div>
 
@@ -206,12 +206,12 @@ export default function GroupDetailPage() {
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5 text-zinc-400">
                   <User className="w-3.5 h-3.5 text-[#FF4F00]" />
-                  <span className="text-zinc-500">PJ:</span>
+                  <span className="text-zinc-400">PJ:</span>
                   <strong className="text-white">{group.leader_name}</strong>
                 </div>
                 <div className="flex items-center gap-1.5 text-zinc-400">
                   <Phone className="w-3.5 h-3.5 text-[#00E676]" />
-                  <span className="text-zinc-500">WA:</span>
+                  <span className="text-zinc-400">WA:</span>
                   <span className="text-zinc-300">{group.leader_phone}</span>
                 </div>
               </div>
@@ -219,10 +219,10 @@ export default function GroupDetailPage() {
               <div className="space-y-1 text-right">
                 <div className="flex items-center justify-end gap-1 text-zinc-400">
                   <Calendar className="w-3.5 h-3.5 text-[#DFFF00]" />
-                  <span className="text-zinc-500">JATUH TEMPO:</span>
+                  <span className="text-zinc-400">JATUH TEMPO:</span>
                   <strong className="text-[#DFFF00]">Tgl {group.billing_day}</strong>
                 </div>
-                <div className="text-[9px] text-zinc-500">
+                <div className="text-[9px] text-zinc-400">
                   POOL: <span className="text-white tabular-nums font-bold">{formatRupiah(totalTarget)}</span>
                 </div>
               </div>
@@ -260,30 +260,30 @@ export default function GroupDetailPage() {
             <div className="grid grid-cols-3 gap-1">
               <button
                 onClick={() => setMessageMode("routine")}
-                className={`py-1 px-1.5 text-[8px] uppercase tracking-wider border transition-all ${
+                className={`py-1 px-1.5 text-[9px] uppercase tracking-wider border transition-all ${
                   messageMode === "routine"
                     ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
-                    : "bg-[#0E0F11] border-[#26282B] text-zinc-400 lg:hover:border-zinc-500"
+                    : "bg-[#0E0F11] border-[#26282B] text-zinc-300 lg:hover:border-zinc-500"
                 }`}
               >
                 PENGINGAT RUTIN
               </button>
               <button
                 onClick={() => setMessageMode("urgent")}
-                className={`py-1 px-1.5 text-[8px] uppercase tracking-wider border transition-all ${
+                className={`py-1 px-1.5 text-[9px] uppercase tracking-wider border transition-all ${
                   messageMode === "urgent"
                     ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
-                    : "bg-[#0E0F11] border-[#26282B] text-zinc-400 lg:hover:border-zinc-500"
+                    : "bg-[#0E0F11] border-[#26282B] text-zinc-300 lg:hover:border-zinc-500"
                 }`}
               >
                 JATUH TEMPO
               </button>
               <button
                 onClick={() => setMessageMode("receipt")}
-                className={`py-1 px-1.5 text-[8px] uppercase tracking-wider border transition-all ${
+                className={`py-1 px-1.5 text-[9px] uppercase tracking-wider border transition-all ${
                   messageMode === "receipt"
                     ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
-                    : "bg-[#0E0F11] border-[#26282B] text-zinc-400 lg:hover:border-zinc-500"
+                    : "bg-[#0E0F11] border-[#26282B] text-zinc-300 lg:hover:border-zinc-500"
                 }`}
               >
                 BUKTI LUNAS
@@ -333,7 +333,7 @@ export default function GroupDetailPage() {
                       className="bg-[#0E0F11] border border-[#26282B] p-2.5 flex items-center justify-between text-xs"
                     >
                       <div className="flex items-center gap-2.5">
-                        <span className="text-[9px] font-mono text-zinc-600">[{idx + 1}]</span>
+                        <span className="text-[9px] font-mono text-zinc-400">[{idx + 1}]</span>
                         <span className="text-white font-sans font-medium">{member}</span>
                       </div>
 

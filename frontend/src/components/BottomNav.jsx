@@ -22,7 +22,7 @@ function BottomNav() {
                 `flex flex-col items-center justify-center p-2 relative active:bg-[#16181B] ${
                   isActive
                     ? "bg-[#141517] text-white"
-                    : "text-zinc-500"
+                    : "text-zinc-400"
                 }`
               }
             >
@@ -31,7 +31,7 @@ function BottomNav() {
                   {/* Top LED Indicator */}
                   <div
                     className={`absolute top-1.5 w-1.5 h-1.5 rounded-full ${
-                      isActive ? "bg-[#FF4F00] ring-1 ring-[#FF4F00]/50" : "bg-zinc-700"
+                      isActive ? "bg-[#FF4F00] ring-1 ring-[#FF4F00]/50" : "bg-zinc-600"
                     }`}
                   />
 
@@ -42,14 +42,14 @@ function BottomNav() {
 
                   <Icon
                     className={`w-4 h-4 mt-1.5 mb-1 ${
-                      isActive ? "text-[#FF4F00]" : "text-zinc-500"
+                      isActive ? "text-[#FF4F00]" : "text-zinc-400"
                     }`}
                   />
 
-                  <div className="flex items-center gap-1 font-mono text-[9px] font-bold tracking-widest">
+                  <div className="flex items-center gap-1 font-mono text-[10px] font-bold tracking-widest">
                     <span>{isActive ? `[ ${item.label} ]` : item.label}</span>
                   </div>
-                  <span className="font-mono text-[7px] text-zinc-600 tracking-tight">
+                  <span className="font-mono text-[9px] text-zinc-400 tracking-wider">
                     {item.sub}
                   </span>
                 </>
