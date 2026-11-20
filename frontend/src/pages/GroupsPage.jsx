@@ -151,18 +151,38 @@ export default function GroupsPage() {
     const trimmed = newMemberInput.trim();
     if (!trimmed) return;
 
+    const currentPj = leaderName.trim().toLowerCase();
+
+    const isDuplicate = (name, currentList) => {
+      const lower = name.toLowerCase();
+      if (
+        leaderIncluded &&
+        (lower === "pj" ||
+          lower === "pj (penanggung jawab)" ||
+          (currentPj && lower === currentPj))
+      ) {
+        return true;
+      }
+      return currentList.some((x) => x.toLowerCase() === lower);
+    };
+
     // Check if comma separated input
     if (trimmed.includes(",")) {
       const parts = trimmed
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
-      setMemberChips((prev) => [
-        ...prev,
-        ...parts.filter((p) => !prev.includes(p) && p !== leaderName.trim()),
-      ]);
+      setMemberChips((prev) => {
+        const next = [...prev];
+        parts.forEach((p) => {
+          if (!isDuplicate(p, next)) {
+            next.push(p);
+          }
+        });
+        return next;
+      });
     } else {
-      if (!memberChips.includes(trimmed) && trimmed !== leaderName.trim()) {
+      if (!isDuplicate(trimmed, memberChips)) {
         setMemberChips((prev) => [...prev, trimmed]);
       }
     }
@@ -173,26 +193,33 @@ export default function GroupsPage() {
     setMemberChips((prev) => prev.filter((m) => m !== nameToRemove));
   };
 
-  // Effective full roster list
+  // Effective full roster list: PJ is guaranteed counted when leaderIncluded is true
   const activeRoster = useMemo(() => {
-    const list = [...memberChips];
-    if (leaderIncluded && leaderName.trim()) {
-      list.unshift(leaderName.trim());
+    const pjDisplayName = leaderName.trim() || "PJ (Penanggung Jawab)";
+    const filteredChips = memberChips.filter(
+      (m) =>
+        m.toLowerCase() !== pjDisplayName.toLowerCase() &&
+        (!leaderName.trim() || m.toLowerCase() !== leaderName.trim().toLowerCase())
+    );
+    if (leaderIncluded) {
+      return [pjDisplayName, ...filteredChips];
     }
-    return list;
+    return filteredChips;
   }, [memberChips, leaderIncluded, leaderName]);
 
   // Real-time calculation of price per person
   const calculatedPricePerPerson = useMemo(() => {
     const total = Number(totalPrice) || 0;
-    const count = activeRoster.length || 1;
+    const count = activeRoster.length;
+    if (count === 0) return total;
     return Math.round(total / count);
   }, [totalPrice, activeRoster]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!groupName.trim() || !serviceName.trim() || !leaderName.trim()) {
+    const pjName = leaderName.trim();
+    if (!groupName.trim() || !serviceName.trim() || !pjName) {
       alert("Field nama grup, layanan, dan nama PJ wajib diisi.");
       return;
     }
@@ -202,23 +229,31 @@ export default function GroupsPage() {
       return;
     }
 
-    if (activeRoster.length === 0) {
+    const otherMembers = memberChips.filter(
+      (m) => m.toLowerCase() !== pjName.toLowerCase()
+    );
+    const finalMemberList = leaderIncluded ? [pjName, ...otherMembers] : otherMembers;
+
+    if (finalMemberList.length === 0) {
       alert("Minimal harus ada 1 anggota dalam grup patungan.");
       return;
     }
 
     try {
       setSubmitting(true);
-      const paidInitial = leaderIncluded && leaderName.trim() ? [leaderName.trim()] : [];
+      const paidInitial = leaderIncluded ? [pjName] : [];
+      const computedFinalPrice = Math.round(
+        (Number(totalPrice) || 0) / finalMemberList.length
+      );
 
       await dataService.createGroup({
         group_name: groupName.trim(),
         service_name: serviceName.trim(),
-        leader_name: leaderName.trim(),
+        leader_name: pjName,
         leader_phone: leaderPhone.trim(),
-        price_per_person: calculatedPricePerPerson,
+        price_per_person: computedFinalPrice,
         billing_day: Number(billingDay) || 1,
-        member_list: activeRoster.join(", "),
+        member_list: finalMemberList.join(", "),
         paid_members: paidInitial,
       });
 
@@ -628,9 +663,11 @@ export default function GroupsPage() {
 
                 {/* Chips Container */}
                 <div className="flex flex-wrap gap-1.5 min-h-[36px] p-2 bg-[#141517] border border-[#26282B]">
-                  {leaderIncluded && leaderName.trim() && (
+                  {leaderIncluded && (
                     <div className="px-2 py-0.5 bg-[#FF4F00]/20 border border-[#FF4F00] text-[#FF4F00] text-[10px] flex items-center gap-1.5">
-                      <span className="font-bold">[PJ] {leaderName.trim()}</span>
+                      <span className="font-bold">
+                        [PJ] {leaderName.trim() || "Penanggung Jawab"}
+                      </span>
                       <button
                         type="button"
                         onClick={() => setLeaderIncluded(false)}
@@ -660,7 +697,7 @@ export default function GroupsPage() {
 
                   {activeRoster.length === 0 && (
                     <span className="text-[10px] text-zinc-600 self-center">
-                      Belum ada anggota. Masukkan nama teman di bawah.
+                      Belum ada anggota. Centang PJ atau masukkan nama teman di bawah.
                     </span>
                   )}
                 </div>
@@ -701,7 +738,7 @@ export default function GroupsPage() {
                 <div className="flex justify-between items-center text-[10px]">
                   <span className="text-zinc-400">JUMLAH ANGGOTA:</span>
                   <span className="text-[#DFFF00] font-bold tabular-nums">
-                    {activeRoster.length} ORANG
+                    {activeRoster.length} ORANG {leaderIncluded ? "(TERMASUK PJ)" : "(TANPA PJ)"}
                   </span>
                 </div>
                 <div className="pt-1.5 border-t border-dashed border-zinc-800 flex justify-between items-center">
