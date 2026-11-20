@@ -46,7 +46,7 @@ export const INITIAL_CATEGORIES = [
 
 export const INITIAL_SERVICES = [
   {
-    id: "s1111111-1111-1111-1111-111111111111",
+    id: "a1111111-1111-1111-1111-111111111111",
     sku: "NETFLIX-PREM",
     name: "Netflix Premium",
     description: "Paket langganan 4K Ultra HD + HDR dengan akses simultan 4 layar dan profil mandiri.",
@@ -56,7 +56,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c1111111-1111-1111-1111-111111111111", name: "Video Streaming" },
   },
   {
-    id: "s2222222-2222-2222-2222-222222222222",
+    id: "a2222222-2222-2222-2222-222222222222",
     sku: "SPOTIFY-FAM",
     name: "Spotify Family",
     description: "Paket musik lossless bebas iklan untuk hingga 6 akun keluarga terpisah.",
@@ -66,7 +66,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c2222222-2222-2222-2222-222222222222", name: "Musik" },
   },
   {
-    id: "s3333333-3333-3333-3333-333333333333",
+    id: "a3333333-3333-3333-3333-333333333333",
     sku: "YOUTUBE-FAM",
     name: "YouTube Premium Family",
     description: "Bebas iklan, putar di latar belakang, dan YouTube Music Premium untuk 5 anggota.",
@@ -76,7 +76,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c1111111-1111-1111-1111-111111111111", name: "Video Streaming" },
   },
   {
-    id: "s4444444-4444-4444-4444-444444444444",
+    id: "a4444444-4444-4444-4444-444444444444",
     sku: "CHATGPT-PLUS",
     name: "ChatGPT Plus Team",
     description: "Akses GPT-4o tanpa batas, DALL-E 3, pembuatan custom GPTs, dan workspace kolaboratif.",
@@ -86,7 +86,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c3333333-3333-3333-3333-333333333333", name: "Produktivitas AI" },
   },
   {
-    id: "s5555555-5555-5555-5555-555555555555",
+    id: "a5555555-5555-5555-5555-555555555555",
     sku: "DISNEY-PREM",
     name: "Disney+ Hotstar Premium",
     description: "Streaming 4K Ultra HD film Marvel, Disney, Pixar, dan serial lokal hingga 3 layar aktif.",
@@ -96,7 +96,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c1111111-1111-1111-1111-111111111111", name: "Video Streaming" },
   },
   {
-    id: "s6666666-6666-6666-6666-666666666666",
+    id: "a6666666-6666-6666-6666-666666666666",
     sku: "CANVA-TEAM",
     name: "Canva Pro Team",
     description: "Desain profesional kolaboratif, Brand Kit premium, Magic Switch AI untuk 5 seat.",
@@ -106,7 +106,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c3333333-3333-3333-3333-333333333333", name: "Produktivitas AI" },
   },
   {
-    id: "s7777777-7777-7777-7777-777777777777",
+    id: "a7777777-7777-7777-7777-777777777777",
     sku: "APPLE-ONE-PREM",
     name: "Apple One Premier",
     description: "Apple Music, Apple TV+, Apple Arcade, dan iCloud+ 2TB berbagi hingga 6 anggota.",
@@ -116,7 +116,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c4444444-4444-4444-4444-444444444444", name: "Cloud & Storage" },
   },
   {
-    id: "s8888888-8888-8888-8888-888888888888",
+    id: "a8888888-8888-8888-8888-888888888888",
     sku: "GOOGLE-ONE-2TB",
     name: "Google One 2TB Family",
     description: "Penyimpanan cloud Google Photos dan Drive bersama 5 anggota keluarga + Gemini Advanced.",
@@ -126,7 +126,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c4444444-4444-4444-4444-444444444444", name: "Cloud & Storage" },
   },
   {
-    id: "s9999999-9999-9999-9999-999999999999",
+    id: "a9999999-9999-9999-9999-999999999999",
     sku: "PRIME-VIDEO",
     name: "Amazon Prime Video",
     description: "Serial original The Boys, Rings of Power, resolusi 4K HDR dengan 3 layar simultan.",
@@ -136,7 +136,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c1111111-1111-1111-1111-111111111111", name: "Video Streaming" },
   },
   {
-    id: "saaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
     sku: "NINTENDO-FAM",
     name: "Nintendo Switch Online Family",
     description: "Akses multiplayer online Nintendo Switch, cloud save, dan katalog retro game 8 akun.",
@@ -146,7 +146,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c5555555-5555-5555-5555-555555555555", name: "Gaming & Edukasi" },
   },
   {
-    id: "sbbbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+    id: "abbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
     sku: "DUOLINGO-FAM",
     name: "Duolingo Super Family",
     description: "Belajar bahasa bebas iklan, nyawa tanpa batas, dan Family Quest untuk 6 anggota.",
@@ -156,7 +156,7 @@ export const INITIAL_SERVICES = [
     categories: { id: "c5555555-5555-5555-5555-555555555555", name: "Gaming & Edukasi" },
   },
   {
-    id: "sccccccccc-cccc-cccc-cccc-cccccccccccc",
+    id: "accccccc-cccc-cccc-cccc-cccccccccccc",
     sku: "MIDJOURNEY-STD",
     name: "Midjourney Standard",
     description: "Akses fast GPU generation 15 jam/bulan, relax GPU unlimited, dan shared gallery 3 seat.",
@@ -169,7 +169,7 @@ export const INITIAL_SERVICES = [
 
 export const INITIAL_GROUPS = [
   {
-    id: "g1111111-1111-1111-1111-111111111111",
+    id: "b1111111-1111-1111-1111-111111111111",
     group_name: "Netflix Nonton Bareng Kos",
     service_name: "Netflix Premium",
     leader_name: "Budi Santoso",
@@ -180,7 +180,7 @@ export const INITIAL_GROUPS = [
     paid_members: ["Budi Santoso", "Andi Pratama"],
   },
   {
-    id: "g2222222-2222-2222-2222-222222222222",
+    id: "b2222222-2222-2222-2222-222222222222",
     group_name: "Spotify Musikan Circle",
     service_name: "Spotify Family",
     leader_name: "Citra Dewi",

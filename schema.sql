@@ -44,7 +44,7 @@ on conflict (id) do nothing;
 -- Insert Services (Expanded Realistic Catalog)
 insert into services (id, sku, name, description, category_id, monthly_price, max_slots) values
   (
-    's1111111-1111-1111-1111-111111111111',
+    'a1111111-1111-1111-1111-111111111111',
     'NETFLIX-PREM',
     'Netflix Premium',
     'Paket langganan 4K Ultra HD + HDR dengan akses simultan 4 layar dan profil mandiri.',
@@ -53,7 +53,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     4
   ),
   (
-    's2222222-2222-2222-2222-222222222222',
+    'a2222222-2222-2222-2222-222222222222',
     'SPOTIFY-FAM',
     'Spotify Family',
     'Paket musik lossless bebas iklan untuk hingga 6 akun keluarga terpisah.',
@@ -62,7 +62,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     6
   ),
   (
-    's3333333-3333-3333-3333-333333333333',
+    'a3333333-3333-3333-3333-333333333333',
     'YOUTUBE-FAM',
     'YouTube Premium Family',
     'Bebas iklan, putar di latar belakang, dan YouTube Music Premium untuk 5 anggota.',
@@ -71,7 +71,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     5
   ),
   (
-    's4444444-4444-4444-4444-444444444444',
+    'a4444444-4444-4444-4444-444444444444',
     'CHATGPT-PLUS',
     'ChatGPT Plus Team',
     'Akses GPT-4o tanpa batas, DALL-E 3, pembuatan custom GPTs, dan workspace kolaboratif.',
@@ -80,7 +80,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     3
   ),
   (
-    's5555555-5555-5555-5555-555555555555',
+    'a5555555-5555-5555-5555-555555555555',
     'DISNEY-PREM',
     'Disney+ Hotstar Premium',
     'Streaming 4K Ultra HD film Marvel, Disney, Pixar, dan serial lokal hingga 3 layar aktif.',
@@ -89,7 +89,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     3
   ),
   (
-    's6666666-6666-6666-6666-666666666666',
+    'a6666666-6666-6666-6666-666666666666',
     'CANVA-TEAM',
     'Canva Pro Team',
     'Desain profesional kolaboratif, Brand Kit premium, Magic Switch AI untuk 5 seat.',
@@ -98,7 +98,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     5
   ),
   (
-    's7777777-7777-7777-7777-777777777777',
+    'a7777777-7777-7777-7777-777777777777',
     'APPLE-ONE-PREM',
     'Apple One Premier',
     'Apple Music, Apple TV+, Apple Arcade, dan iCloud+ 2TB berbagi hingga 6 anggota.',
@@ -107,7 +107,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     6
   ),
   (
-    's8888888-8888-8888-8888-888888888888',
+    'a8888888-8888-8888-8888-888888888888',
     'GOOGLE-ONE-2TB',
     'Google One 2TB Family',
     'Penyimpanan cloud Google Photos dan Drive bersama 5 anggota keluarga + Gemini Advanced.',
@@ -116,7 +116,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     5
   ),
   (
-    's9999999-9999-9999-9999-999999999999',
+    'a9999999-9999-9999-9999-999999999999',
     'PRIME-VIDEO',
     'Amazon Prime Video',
     'Serial original The Boys, Rings of Power, resolusi 4K HDR dengan 3 layar simultan.',
@@ -125,7 +125,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     3
   ),
   (
-    'saaaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+    'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
     'NINTENDO-FAM',
     'Nintendo Switch Online Family',
     'Akses multiplayer online Nintendo Switch, cloud save, dan katalog retro game 8 akun.',
@@ -134,7 +134,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     8
   ),
   (
-    'sbbbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    'abbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     'DUOLINGO-FAM',
     'Duolingo Super Family',
     'Belajar bahasa bebas iklan, nyawa tanpa batas, dan Family Quest untuk 6 anggota.',
@@ -143,7 +143,7 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
     6
   ),
   (
-    'sccccccccc-cccc-cccc-cccc-cccccccccccc',
+    'accccccc-cccc-cccc-cccc-cccccccccccc',
     'MIDJOURNEY-STD',
     'Midjourney Standard',
     'Akses fast GPU generation 15 jam/bulan, relax GPU unlimited, dan shared gallery 3 seat.',
@@ -156,7 +156,7 @@ on conflict (sku) do nothing;
 -- Insert Sample Split Groups
 insert into split_groups (id, group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members) values
   (
-    'g1111111-1111-1111-1111-111111111111',
+    'b1111111-1111-1111-1111-111111111111',
     'Netflix Nonton Bareng Kos',
     'Netflix Premium',
     'Budi Santoso',
@@ -167,7 +167,7 @@ insert into split_groups (id, group_name, service_name, leader_name, leader_phon
     'Budi Santoso, Andi Pratama'
   ),
   (
-    'g2222222-2222-2222-2222-222222222222',
+    'b2222222-2222-2222-2222-222222222222',
     'Spotify Musikan Circle',
     'Spotify Family',
     'Citra Dewi',
