@@ -5,7 +5,7 @@ export default function BottomNav() {
   const navItems = [
     { to: "/services", label: "KATALOG", sub: "SYS.01", icon: Layers },
     { to: "/groups", label: "GRUP", sub: "SYS.02", icon: Cpu },
-    { to: "/profile", label: "PROFIL", sub: "SYS.03", icon: Terminal },
+    { to: "/profile", label: "DIAGNOSTIK", sub: "SYS.03", icon: Terminal },
   ];
 
   return (
@@ -34,12 +34,23 @@ export default function BottomNav() {
                     }`}
                   />
 
-                  <Icon className={`w-4 h-4 mt-2 mb-1 ${isActive ? "text-[#FF4F00]" : "text-zinc-500"}`} />
+                  {/* Active Scanline indicator bar at bottom */}
+                  {isActive && (
+                    <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#FF4F00]" />
+                  )}
+
+                  <Icon
+                    className={`w-4 h-4 mt-1.5 mb-1 transition-colors duration-150 ${
+                      isActive ? "text-[#FF4F00]" : "text-zinc-500 group-hover:text-zinc-300"
+                    }`}
+                  />
 
                   <div className="flex items-center gap-1 font-mono text-[9px] font-bold tracking-widest">
                     <span>{isActive ? `[ ${item.label} ]` : item.label}</span>
                   </div>
-                  <span className="font-mono text-[7px] text-zinc-600 tracking-tight">{item.sub}</span>
+                  <span className="font-mono text-[7px] text-zinc-600 tracking-tight">
+                    {item.sub}
+                  </span>
                 </>
               )}
             </NavLink>

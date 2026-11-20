@@ -15,5 +15,5 @@ SubScribe/
 ```
 
 ## Quick Start
-Detailed setup instructions and documentation are available in the [docs/](file:///d:/18/Code/SubScribe/docs/README.md) directory.
+Detailed setup instructions and documentation are available in the [docs/](./docs/README.md) directory.
 

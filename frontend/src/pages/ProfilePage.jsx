@@ -1,53 +1,182 @@
-import { useState } from "react";
-import { Terminal, GitBranch, Cpu, Plus, CheckCircle2, AlertTriangle } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Terminal,
+  GitBranch,
+  Cpu,
+  Plus,
+  CheckCircle2,
+  AlertTriangle,
+  RotateCcw,
+  Download,
+  Upload,
+  HardDrive,
+  Wifi,
+  Package,
+} from "lucide-react";
+import { dataService } from "../services/dataService";
 
 export default function ProfilePage() {
-  const [categoryName, setCategoryName] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [activeFormTab, setActiveFormTab] = useState("category"); // 'category' | 'service'
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  // Category form state
+  const [categoryName, setCategoryName] = useState("");
+  const [catSubmitting, setCatSubmitting] = useState(false);
+  const [catMessage, setCatMessage] = useState(null);
+
+  // Service form state
+  const [serviceSku, setServiceSku] = useState("");
+  const [serviceName, setServiceName] = useState("");
+  const [serviceDesc, setServiceDesc] = useState("");
+  const [serviceCatId, setServiceCatId] = useState("");
+  const [servicePrice, setServicePrice] = useState("");
+  const [serviceSlots, setServiceSlots] = useState("4");
+  const [srvSubmitting, setSrvSubmitting] = useState(false);
+  const [srvMessage, setSrvMessage] = useState(null);
+
+  // Diagnostics state
+  const [storageBytes, setStorageBytes] = useState(0);
+  const [isStandalone, setIsStandalone] = useState(false);
+  const [resetConfirm, setResetConfirm] = useState(false);
+
+  useEffect(() => {
+    async function loadInitial() {
+      const res = await dataService.getCategories();
+      setCategories(res.data || []);
+      if (res.data && res.data.length > 0) {
+        setServiceCatId(res.data[0].id);
+      }
+
+      // Check display mode
+      const standalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+      setIsStandalone(standalone);
+
+      // Estimate storage bytes
+      try {
+        let total = 0;
+        for (let x in localStorage) {
+          if (localStorage.hasOwnProperty(x)) {
+            total += (localStorage[x].length + x.length) * 2;
+          }
+        }
+        setStorageBytes(total);
+      } catch {
+        setStorageBytes(1024);
+      }
+    }
+    loadInitial();
+  }, []);
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
     if (!categoryName.trim()) return;
 
     try {
-      setSubmitting(true);
-      setMessage(null);
-      const res = await fetch(`${API_URL}/api/categories`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: categoryName.trim() })
+      setCatSubmitting(true);
+      setCatMessage(null);
+      const res = await dataService.createCategory(categoryName.trim());
+      setCatMessage({
+        type: "success",
+        text: `SUCCESS: CATEGORY "${res.name}" RECORDED [ID: ${res.id.slice(0, 8)}]`,
       });
-      const result = await res.json();
-      if (result.success) {
-        setMessage({ type: "success", text: `SUCCESS: CATEGORY "${result.data.name}" RECORDED [ID: ${result.data.id.slice(0, 8)}]` });
-        setCategoryName("");
-      } else {
-        setMessage({ type: "error", text: `FAILED: ${result.message || "UNKNOWN_ERROR"}` });
-      }
+      setCategoryName("");
+      const updated = await dataService.getCategories();
+      setCategories(updated.data || []);
     } catch (err) {
       console.error(err);
-      setMessage({ type: "error", text: "FAULT: SERVER_CONNECTION_INTERRUPTED" });
+      setCatMessage({ type: "error", text: "FAULT: UNABLE_TO_DISPATCH_CATEGORY" });
     } finally {
-      setSubmitting(false);
+      setCatSubmitting(false);
     }
   };
 
+  const handleAddService = async (e) => {
+    e.preventDefault();
+    if (!serviceSku.trim() || !serviceName.trim() || !servicePrice) return;
+
+    try {
+      setSrvSubmitting(true);
+      setSrvMessage(null);
+      const res = await dataService.createService({
+        sku: serviceSku.trim(),
+        name: serviceName.trim(),
+        description: serviceDesc.trim(),
+        category_id: serviceCatId,
+        monthly_price: Number(servicePrice) || 0,
+        max_slots: Number(serviceSlots) || 1,
+      });
+
+      setSrvMessage({
+        type: "success",
+        text: `SUCCESS: SERVICE "${res.name}" (${res.sku}) REGISTERED`,
+      });
+      setServiceSku("");
+      setServiceName("");
+      setServiceDesc("");
+      setServicePrice("");
+    } catch (err) {
+      console.error(err);
+      setSrvMessage({ type: "error", text: "FAULT: UNABLE_TO_REGISTER_SERVICE" });
+    } finally {
+      setSrvSubmitting(false);
+    }
+  };
+
+  const handleFactoryReset = () => {
+    dataService.resetToFactory();
+    setResetConfirm(false);
+    alert("APPARATUS REGISTRY RESET TO FACTORY PRESETS.");
+    window.location.reload();
+  };
+
+  const handleExportJSON = () => {
+    const data = dataService.exportSnapshot();
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `subscribe-snapshot-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportJSON = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result;
+      if (typeof content === "string") {
+        const ok = dataService.importSnapshot(content);
+        if (ok) {
+          alert("SNAPSHOT RESTORED SUCCESSFULLY.");
+          window.location.reload();
+        } else {
+          alert("INVALID SNAPSHOT PAYLOAD.");
+        }
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
-    <div className="p-4 space-y-4 font-mono">
+    <div className="p-3.5 space-y-3 font-mono">
       {/* Header Apparatus Diagnostics */}
-      <div className="border border-[#26282B] bg-[#111214] p-3 space-y-2">
+      <div className="border border-[#26282B] bg-[#111214] p-3 space-y-2 relative bracket-frame">
         <div className="flex items-center justify-between border-b border-[#26282B] pb-2 text-[9px] uppercase tracking-wider text-zinc-400">
           <span className="flex items-center gap-1.5 text-[#FF4F00] font-bold">
             <Terminal className="w-3.5 h-3.5" /> SEC.03 // APPARATUS_DIAGNOSTICS
           </span>
-          <span className="text-[#00E676] font-bold">STATUS: NOMINAL</span>
+          <span className="text-[#00E676] font-bold">TELEMETRY: OK</span>
         </div>
 
         <div className="flex items-center gap-3 pt-1">
-          <div className="w-10 h-10 bg-[#FF4F00] text-black font-black text-xl flex items-center justify-center font-mono">
+          <div className="w-10 h-10 bg-[#FF4F00] text-black font-black text-xl flex items-center justify-center font-mono shadow-[0_0_10px_rgba(255,79,0,0.4)]">
             S
           </div>
           <div>
@@ -60,14 +189,34 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="pt-2 border-t border-dashed border-zinc-800 grid grid-cols-2 gap-2 text-[10px] text-zinc-400">
-          <div>BUILD_REV: <span className="text-zinc-200">v1.2.0-utilitarian</span></div>
-          <div>TARGET: <span className="text-[#DFFF00]">PWA / ANDROID_APK</span></div>
+        <div className="pt-2 border-t border-dashed border-zinc-800 grid grid-cols-2 gap-1.5 text-[9px] text-zinc-400 select-none">
+          <div className="bg-[#0E0F11] border border-[#26282B] p-1.5">
+            <span className="text-zinc-500 block">BUILD_REV</span>
+            <span className="text-zinc-200 font-bold">v1.2.0-utilitarian</span>
+          </div>
+          <div className="bg-[#0E0F11] border border-[#26282B] p-1.5">
+            <span className="text-zinc-500 block">TARGET_ENVIRONMENT</span>
+            <span className="text-[#DFFF00] font-bold">
+              {isStandalone ? "STANDALONE_APK" : "BROWSER_PWA"}
+            </span>
+          </div>
+          <div className="bg-[#0E0F11] border border-[#26282B] p-1.5">
+            <span className="text-zinc-500 block">CACHE_STORAGE</span>
+            <span className="text-zinc-200 font-bold tabular-nums">
+              {(storageBytes / 1024).toFixed(1)} KB INDEXED
+            </span>
+          </div>
+          <div className="bg-[#0E0F11] border border-[#26282B] p-1.5">
+            <span className="text-zinc-500 block">NETWORK_MODE</span>
+            <span className="text-[#00E676] font-bold">
+              {navigator.onLine ? "ONLINE_ACTIVE" : "OFFLINE_STANDBY"}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Developer Identification Panel */}
-      <div className="border border-[#26282B] bg-[#111214] p-3.5 space-y-2.5 relative">
+      <div className="border border-[#26282B] bg-[#111214] p-3.5 space-y-2 relative">
         <div className="absolute top-1 left-1.5 text-[8px] text-zinc-600">+</div>
         <div className="absolute top-1 right-1.5 text-[8px] text-zinc-600">+</div>
 
@@ -75,7 +224,7 @@ export default function ProfilePage() {
           <Cpu className="w-3 h-3 text-[#FF4F00]" /> OPERATOR_CREDENTIALS
         </div>
 
-        <div className="space-y-1.5 text-[11px]">
+        <div className="space-y-1 text-[11px]">
           <div className="flex justify-between items-center py-0.5 border-b border-dashed border-zinc-900">
             <span className="text-zinc-500">OPERATOR:</span>
             <span className="text-white font-bold font-sans">Praktikan SubScribe</span>
@@ -105,48 +254,244 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      {/* API Calibration Apparatus Form */}
-      <div className="border border-[#26282B] bg-[#111214] p-3.5 space-y-2.5 relative">
-        <div className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider border-b border-zinc-800 pb-1.5">
-          [ API_TEST_APPARATUS // POST_CATEGORIES ]
-        </div>
-        <p className="text-[10px] text-zinc-400">
-          Uji integrasi REST API backend secara langsung ke tabel categories.
-        </p>
+      {/* Administrative Registry Calibration Forms */}
+      <div className="border border-[#26282B] bg-[#111214] p-3.5 space-y-2.5">
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+          <span className="text-[10px] font-bold text-white uppercase tracking-wider">
+            [ REGISTRY_ADMIN_APPARATUS ]
+          </span>
 
-        <form onSubmit={handleAddCategory} className="space-y-2 text-xs">
-          <div>
-            <input
-              type="text"
-              required
-              placeholder="CATEGORY_NAME (e.g. CLOUD_STORAGE)"
-              value={categoryName}
-              onChange={(e) => setCategoryName(e.target.value)}
-              className="w-full bg-[#0E0F11] border border-[#26282B] px-2.5 py-1.5 text-white focus:outline-none focus:border-[#FF4F00] uppercase text-[11px]"
-            />
-          </div>
-
-          {message && (
-            <div
-              className={`p-2 border text-[10px] flex items-center gap-1.5 ${
-                message.type === "success"
-                  ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
-                  : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveFormTab("category")}
+              className={`px-2 py-0.5 text-[8px] uppercase tracking-wider border transition-colors ${
+                activeFormTab === "category"
+                  ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
+                  : "bg-[#0E0F11] border-[#26282B] text-zinc-400 hover:text-white"
               }`}
             >
-              {message.type === "success" ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertTriangle className="w-3.5 h-3.5" />}
-              <span>{message.text}</span>
-            </div>
-          )}
+              + KATEGORI
+            </button>
+            <button
+              onClick={() => setActiveFormTab("service")}
+              className={`px-2 py-0.5 text-[8px] uppercase tracking-wider border transition-colors ${
+                activeFormTab === "service"
+                  ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
+                  : "bg-[#0E0F11] border-[#26282B] text-zinc-400 hover:text-white"
+              }`}
+            >
+              + LAYANAN
+            </button>
+          </div>
+        </div>
 
+        {/* Tab 1: Dispatch Category */}
+        {activeFormTab === "category" ? (
+          <form onSubmit={handleAddCategory} className="space-y-2 text-xs">
+            <p className="text-[10px] text-zinc-400">
+              Tambah unit kategori baru ke dalam registry (POST /api/categories).
+            </p>
+            <div>
+              <input
+                type="text"
+                required
+                placeholder="NAMA KATEGORI (e.g. CLOUD_STORAGE)"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+                className="w-full bg-[#0E0F11] border border-[#26282B] px-2.5 py-1.5 text-white focus:outline-none focus:border-[#FF4F00] text-[11px] uppercase"
+              />
+            </div>
+
+            {catMessage && (
+              <div
+                className={`p-2 border text-[10px] flex items-center gap-1.5 ${
+                  catMessage.type === "success"
+                    ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
+                    : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
+                }`}
+              >
+                {catMessage.type === "success" ? (
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                ) : (
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                )}
+                <span>{catMessage.text}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={catSubmitting}
+              className="w-full py-2 bg-zinc-800 hover:bg-[#FF4F00] hover:text-black border border-zinc-700 text-[#E5E5E0] font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" /> {catSubmitting ? "RECORDING..." : "[ DISPATCH_CATEGORY ]"}
+            </button>
+          </form>
+        ) : (
+          /* Tab 2: Register Service */
+          <form onSubmit={handleAddService} className="space-y-2 text-xs">
+            <p className="text-[10px] text-zinc-400">
+              Daftarkan layanan digital baru ke katalog (POST /api/services).
+            </p>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[8px] uppercase text-zinc-500 mb-0.5">SKU *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="APPLE-ONE"
+                  value={serviceSku}
+                  onChange={(e) => setServiceSku(e.target.value)}
+                  className="w-full bg-[#0E0F11] border border-[#26282B] px-2 py-1 text-white uppercase text-[10px] focus:outline-none focus:border-[#FF4F00]"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase text-zinc-500 mb-0.5">KATEGORI *</label>
+                <select
+                  value={serviceCatId}
+                  onChange={(e) => setServiceCatId(e.target.value)}
+                  className="w-full bg-[#0E0F11] border border-[#26282B] px-2 py-1 text-white text-[10px] focus:outline-none focus:border-[#FF4F00]"
+                >
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[8px] uppercase text-zinc-500 mb-0.5">NAMA LAYANAN *</label>
+              <input
+                type="text"
+                required
+                placeholder="Apple One Premier"
+                value={serviceName}
+                onChange={(e) => setServiceName(e.target.value)}
+                className="w-full bg-[#0E0F11] border border-[#26282B] px-2 py-1 text-white text-[10px] focus:outline-none focus:border-[#FF4F00]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-[8px] uppercase text-zinc-500 mb-0.5">DESKRIPSI FITUR</label>
+              <input
+                type="text"
+                placeholder="iCloud 2TB, Apple Music, TV+ 5 orang"
+                value={serviceDesc}
+                onChange={(e) => setServiceDesc(e.target.value)}
+                className="w-full bg-[#0E0F11] border border-[#26282B] px-2 py-1 text-white text-[10px] focus:outline-none focus:border-[#FF4F00]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-[8px] uppercase text-zinc-500 mb-0.5">HARGA / BULAN (RP) *</label>
+                <input
+                  type="number"
+                  required
+                  placeholder="150000"
+                  value={servicePrice}
+                  onChange={(e) => setServicePrice(e.target.value)}
+                  className="w-full bg-[#0E0F11] border border-[#26282B] px-2 py-1 text-white text-[10px] focus:outline-none focus:border-[#FF4F00]"
+                />
+              </div>
+              <div>
+                <label className="block text-[8px] uppercase text-zinc-500 mb-0.5">MAX SLOTS *</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  required
+                  value={serviceSlots}
+                  onChange={(e) => setServiceSlots(e.target.value)}
+                  className="w-full bg-[#0E0F11] border border-[#26282B] px-2 py-1 text-white text-[10px] focus:outline-none focus:border-[#FF4F00]"
+                />
+              </div>
+            </div>
+
+            {srvMessage && (
+              <div
+                className={`p-2 border text-[10px] flex items-center gap-1.5 ${
+                  srvMessage.type === "success"
+                    ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
+                    : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
+                }`}
+              >
+                {srvMessage.type === "success" ? (
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                ) : (
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                )}
+                <span>{srvMessage.text}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={srvSubmitting}
+              className="w-full py-2 bg-zinc-800 hover:bg-[#FF4F00] hover:text-black border border-zinc-700 text-[#E5E5E0] font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+            >
+              <Package className="w-3.5 h-3.5" /> {srvSubmitting ? "SAVING..." : "[ REGISTER_SERVICE ]"}
+            </button>
+          </form>
+        )}
+      </div>
+
+      {/* Factory Maintenance Deck */}
+      <div className="border border-[#26282B] bg-[#111214] p-3.5 space-y-2">
+        <div className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider border-b border-zinc-800 pb-1.5 flex items-center gap-1.5">
+          <HardDrive className="w-3 h-3 text-[#FF4F00]" /> DATA_MAINTENANCE_DECK
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 pt-1">
           <button
-            type="submit"
-            disabled={submitting}
-            className="w-full py-2 bg-zinc-800 hover:bg-[#FF4F00] hover:text-black border border-zinc-700 text-[#E5E5E0] font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+            onClick={handleExportJSON}
+            className="p-2 bg-[#0E0F11] hover:bg-zinc-900 border border-[#26282B] text-zinc-300 hover:text-white text-[9px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
           >
-            <Plus className="w-3.5 h-3.5" /> {submitting ? "RECORDING..." : "[ DISPATCH_CATEGORY ]"}
+            <Download className="w-3 h-3 text-[#00E676]" /> [ EXPORT_JSON ]
           </button>
-        </form>
+
+          <label className="p-2 bg-[#0E0F11] hover:bg-zinc-900 border border-[#26282B] text-zinc-300 hover:text-white text-[9px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-center">
+            <Upload className="w-3 h-3 text-[#DFFF00]" /> [ IMPORT_JSON ]
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleImportJSON}
+              className="hidden"
+            />
+          </label>
+        </div>
+
+        {resetConfirm ? (
+          <div className="pt-2 border-t border-dashed border-zinc-800 space-y-1.5">
+            <p className="text-[9px] text-[#FF4F00]">
+              KONFIRMASI: Semua data custom akan dikembalikan ke data awal!
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleFactoryReset}
+                className="flex-1 py-1.5 bg-[#FF4F00] text-black font-bold text-[9px] uppercase"
+              >
+                [ YA, RESET PABRIK ]
+              </button>
+              <button
+                onClick={() => setResetConfirm(false)}
+                className="px-3 py-1.5 bg-zinc-800 text-zinc-300 text-[9px] uppercase"
+              >
+                [ BATAL ]
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setResetConfirm(true)}
+            className="w-full mt-1 py-2 bg-[#0E0F11] hover:bg-rose-950/30 border border-zinc-800 hover:border-rose-700 text-zinc-400 hover:text-rose-400 text-[9px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <RotateCcw className="w-3 h-3" /> [ RESET_TO_FACTORY_PRESETS ]
+          </button>
+        )}
       </div>
     </div>
   );

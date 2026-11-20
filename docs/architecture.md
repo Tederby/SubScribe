@@ -42,3 +42,6 @@ SubScribe follows a two-tier monorepo architecture:
   - `viewport-fit=cover` with safe-area insets (`env(safe-area-inset-top)` / `env(safe-area-inset-bottom)`).
   - Touch latency optimization (`touch-action: manipulation`, tap-highlight removal).
   - Offline asset caching and runtime API caching via Workbox in `vite-plugin-pwa`.
+- **Data Resilience Layer:**
+  - `dataService.js` coordinates client-side caching with graceful failover to Indonesian seed presets when backend connectivity is offline.
+  - Live vs Cache telemetry status displayed in real time on the apparatus header.
