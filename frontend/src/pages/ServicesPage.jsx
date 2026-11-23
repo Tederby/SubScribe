@@ -308,9 +308,9 @@ export default function ServicesPage() {
 
       {/* Modal: Tambah Layanan Baru ke Katalog (z-[70] for safe mobile stacking) */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-[#121316] border border-[#2D3035] w-full max-w-lg p-4 sm:p-6 space-y-4 max-h-[88vh] overflow-y-auto pb-12 sm:pb-6 shadow-2xl rounded-sm">
-            <div className="flex items-center justify-between border-b border-[#26282B] pb-2.5">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-[70] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#121316] border border-[#2D3035] w-full max-w-lg max-h-[65vh] sm:max-h-[82vh] mb-16 sm:mb-0 flex flex-col shadow-2xl rounded-sm">
+            <div className="shrink-0 p-3.5 sm:p-4 border-b border-[#26282B] flex items-center justify-between">
               <span className="text-[#FF4F00] font-mono font-bold text-sm flex items-center gap-2">
                 <Package className="w-4 h-4" /> [ TAMBAH LAYANAN KE KATALOG ]
               </span>
@@ -323,110 +323,114 @@ export default function ServicesPage() {
               </button>
             </div>
 
-            <form onSubmit={handleCreateService} className="space-y-3.5 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <form onSubmit={handleCreateService} className="flex flex-col flex-1 min-h-0">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1 font-mono">
+                      SKU / KODE UNIK *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. DISNEY-PREM"
+                      value={newSku}
+                      onChange={(e) => setNewSku(e.target.value)}
+                      className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white font-mono uppercase focus:outline-none focus:border-[#FF4F00]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1 font-mono">
+                      SEKTOR / KATEGORI *
+                    </label>
+                    <select
+                      value={newCatId}
+                      onChange={(e) => setNewCatId(e.target.value)}
+                      className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-zinc-200 focus:outline-none focus:border-[#FF4F00]"
+                    >
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1 font-mono">
-                    SKU / KODE UNIK *
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                    Nama Resmi Layanan *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. DISNEY-PREM"
-                    value={newSku}
-                    onChange={(e) => setNewSku(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white font-mono uppercase focus:outline-none focus:border-[#FF4F00]"
+                    placeholder="e.g. Disney+ Hotstar Premium"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white focus:outline-none focus:border-[#FF4F00]"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1 font-mono">
-                    SEKTOR / KATEGORI *
-                  </label>
-                  <select
-                    value={newCatId}
-                    onChange={(e) => setNewCatId(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-zinc-200 focus:outline-none focus:border-[#FF4F00]"
-                  >
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                  Nama Resmi Layanan *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Disney+ Hotstar Premium"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white focus:outline-none focus:border-[#FF4F00]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                  Deskripsi Paket & Fitur
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Akses 4K Ultra HD simultan 3 layar profil mandiri"
-                  value={newDesc}
-                  onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white focus:outline-none focus:border-[#FF4F00]"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                    Biaya Bulanan Resmi (Rp) *
+                    Deskripsi Paket & Fitur
                   </label>
                   <input
-                    type="number"
-                    required
-                    placeholder="119000"
-                    value={newPrice}
-                    onChange={(e) => setNewPrice(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white font-mono focus:outline-none focus:border-[#FF4F00]"
+                    type="text"
+                    placeholder="e.g. Akses 4K Ultra HD simultan 3 layar profil mandiri"
+                    value={newDesc}
+                    onChange={(e) => setNewDesc(e.target.value)}
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white focus:outline-none focus:border-[#FF4F00]"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                    Kapasitas Slot Akun *
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="20"
-                    required
-                    value={newSlots}
-                    onChange={(e) => setNewSlots(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white font-mono focus:outline-none focus:border-[#FF4F00]"
-                  />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                      Biaya Bulanan Resmi (Rp) *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      placeholder="119000"
+                      value={newPrice}
+                      onChange={(e) => setNewPrice(e.target.value)}
+                      className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white font-mono focus:outline-none focus:border-[#FF4F00]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                      Kapasitas Slot Akun *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      required
+                      value={newSlots}
+                      onChange={(e) => setNewSlots(e.target.value)}
+                      className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white font-mono focus:outline-none focus:border-[#FF4F00]"
+                    />
+                  </div>
                 </div>
+
+                {formFeedback && (
+                  <div className="p-2.5 border border-[#00E676] bg-zinc-900 text-[#00E676] text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    <span>{formFeedback}</span>
+                  </div>
+                )}
               </div>
 
-              {formFeedback && (
-                <div className="p-2.5 border border-[#00E676] bg-zinc-900 text-[#00E676] text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
-                  <span>{formFeedback}</span>
-                </div>
-              )}
-
-              <button
-                type="submit"
-                disabled={submittingService}
-                className="w-full py-3 bg-[#FF4F00] hover:bg-[#ff651c] text-black font-bold font-mono uppercase tracking-wider text-xs transition-colors active:bg-[#ff651c] rounded-sm"
-              >
-                {submittingService ? "MENYIMPAN LAYANAN..." : "[ SIMPAN KE KATALOG RESMI ]"}
-              </button>
+              <div className="shrink-0 p-3 bg-[#0E0F11] border-t border-[#26282B]">
+                <button
+                  type="submit"
+                  disabled={submittingService}
+                  className="w-full py-3 bg-[#FF4F00] hover:bg-[#ff651c] text-black font-bold font-mono uppercase tracking-wider text-xs transition-colors active:bg-[#ff651c] rounded-sm"
+                >
+                  {submittingService ? "MENYIMPAN LAYANAN..." : "[ SIMPAN KE KATALOG RESMI ]"}
+                </button>
+              </div>
             </form>
           </div>
         </div>

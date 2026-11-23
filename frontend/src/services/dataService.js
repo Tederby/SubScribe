@@ -216,6 +216,21 @@ function saveLocal(key, value) {
 }
 
 export const dataService = {
+  getAuthHeaders() {
+    const token = this.getStoredToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  },
+
+  getUserGroupKey() {
+    const user = this.getStoredUser();
+    return user ? `${STORAGE_KEYS.GROUPS}_${user.id}` : STORAGE_KEYS.GROUPS;
+  },
+
+  getUserInitialGroups() {
+    const user = this.getStoredUser();
+    return user && user.email === "admin@subscribe.local" ? INITIAL_GROUPS : [];
+  },
+
   // 1. Categories
   async getCategories() {
     try {
@@ -338,14 +353,24 @@ export const dataService = {
     return newService;
   },
 
-  // 3. Groups
+  // 3. Groups (Scoped per authenticated User)
   async getGroups() {
+    const user = this.getStoredUser();
+    if (!user) {
+      return { data: [], source: "auth_required" };
+    }
+
+    const storageKey = this.getUserGroupKey();
+    const fallbackGroups = this.getUserInitialGroups();
+
     try {
-      const res = await fetch(`${API_URL}/api/groups`, { signal: AbortSignal.timeout(2500) });
+      const res = await fetch(`${API_URL}/api/groups`, {
+        headers: { ...this.getAuthHeaders() },
+        signal: AbortSignal.timeout(2500),
+      });
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
-        const cached = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
-        // Retain locally-created groups that have not yet been synced to backend
+        const cached = loadLocal(storageKey, fallbackGroups);
         const localOnlyGroups = cached.filter(
           (c) => c.id.startsWith("g-") && !json.data.some((b) => b.id === c.id)
         );
@@ -369,22 +394,28 @@ export const dataService = {
           ...localOnlyGroups,
         ];
 
-        saveLocal(STORAGE_KEYS.GROUPS, merged);
+        saveLocal(storageKey, merged);
         return { data: merged, source: "live" };
       }
     } catch {
       // fallback
     }
-    const cached = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+    const cached = loadLocal(storageKey, fallbackGroups);
     return { data: cached, source: "cache" };
   },
 
   async getGroupById(id) {
+    const storageKey = this.getUserGroupKey();
+    const fallbackGroups = this.getUserInitialGroups();
+
     try {
-      const res = await fetch(`${API_URL}/api/groups/${id}`, { signal: AbortSignal.timeout(2500) });
+      const res = await fetch(`${API_URL}/api/groups/${id}`, {
+        headers: { ...this.getAuthHeaders() },
+        signal: AbortSignal.timeout(2500),
+      });
       const json = await res.json();
       if (json.success && json.data) {
-        const cached = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+        const cached = loadLocal(storageKey, fallbackGroups);
         const c = cached.find((x) => x.id === id);
         return {
           ...json.data,
@@ -394,11 +425,15 @@ export const dataService = {
     } catch {
       // fallback
     }
-    const list = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+    const list = loadLocal(storageKey, fallbackGroups);
     return list.find((g) => g.id === id) || null;
   },
 
   async createGroup(payload) {
+    const user = this.getStoredUser();
+    const storageKey = this.getUserGroupKey();
+    const fallbackGroups = this.getUserInitialGroups();
+
     const sanitizedPhone = sanitizeIndonesianPhone(payload.leader_phone);
     const paidList = Array.isArray(payload.paid_members)
       ? payload.paid_members
@@ -406,6 +441,7 @@ export const dataService = {
 
     const newGroup = {
       id: `g-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+      user_id: user?.id,
       group_name: payload.group_name.trim(),
       service_name: payload.service_name.trim(),
       leader_name: payload.leader_name.trim(),
@@ -425,30 +461,36 @@ export const dataService = {
     try {
       const res = await fetch(`${API_URL}/api/groups`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...this.getAuthHeaders(),
+        },
         body: JSON.stringify(backendPayload),
         signal: AbortSignal.timeout(3000),
       });
       const json = await res.json();
       if (json.success && json.data) {
-        const list = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+        const list = loadLocal(storageKey, fallbackGroups);
         const saved = { ...json.data, paid_members: paidList };
         list.push(saved);
-        saveLocal(STORAGE_KEYS.GROUPS, list);
+        saveLocal(storageKey, list);
         return saved;
       }
     } catch {
       // offline fallback
     }
 
-    const list = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+    const list = loadLocal(storageKey, fallbackGroups);
     list.push(newGroup);
-    saveLocal(STORAGE_KEYS.GROUPS, list);
+    saveLocal(storageKey, list);
     return newGroup;
   },
 
   async updateGroup(id, payload) {
-    const list = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+    const storageKey = this.getUserGroupKey();
+    const fallbackGroups = this.getUserInitialGroups();
+
+    const list = loadLocal(storageKey, fallbackGroups);
     const idx = list.findIndex((g) => g.id === id);
     if (idx === -1) return null;
 
@@ -464,7 +506,10 @@ export const dataService = {
     try {
       await fetch(`${API_URL}/api/groups/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...this.getAuthHeaders(),
+        },
         body: JSON.stringify(backendPayload),
         signal: AbortSignal.timeout(3000),
       });
@@ -473,23 +518,27 @@ export const dataService = {
     }
 
     list[idx] = { ...list[idx], ...payload };
-    saveLocal(STORAGE_KEYS.GROUPS, list);
+    saveLocal(storageKey, list);
     return list[idx];
   },
 
   async deleteGroup(id) {
+    const storageKey = this.getUserGroupKey();
+    const fallbackGroups = this.getUserInitialGroups();
+
     try {
       await fetch(`${API_URL}/api/groups/${id}`, {
         method: "DELETE",
+        headers: { ...this.getAuthHeaders() },
         signal: AbortSignal.timeout(3000),
       });
     } catch {
       // offline
     }
 
-    const list = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+    const list = loadLocal(storageKey, fallbackGroups);
     const filtered = list.filter((g) => g.id !== id);
-    saveLocal(STORAGE_KEYS.GROUPS, filtered);
+    saveLocal(storageKey, filtered);
     return true;
   },
 
@@ -621,6 +670,7 @@ export const dataService = {
       if (json.success && json.data) {
         saveLocal(STORAGE_KEYS.AUTH_TOKEN, json.data.token);
         saveLocal(STORAGE_KEYS.AUTH_USER, json.data.user);
+        window.dispatchEvent(new Event("subscribe:auth-changed"));
         return { success: true, data: json.data };
       }
       return { success: false, message: json.message || "Email atau password tidak sesuai" };
@@ -638,6 +688,7 @@ export const dataService = {
         };
         saveLocal(STORAGE_KEYS.AUTH_TOKEN, mockData.token);
         saveLocal(STORAGE_KEYS.AUTH_USER, mockData.user);
+        window.dispatchEvent(new Event("subscribe:auth-changed"));
         return { success: true, data: mockData };
       }
       return { success: false, message: "Koneksi ke server backend gagal" };
@@ -656,6 +707,7 @@ export const dataService = {
       if (json.success && json.data) {
         saveLocal(STORAGE_KEYS.AUTH_TOKEN, json.data.token);
         saveLocal(STORAGE_KEYS.AUTH_USER, json.data.user);
+        window.dispatchEvent(new Event("subscribe:auth-changed"));
         return { success: true, data: json.data };
       }
       return { success: false, message: json.message || "Gagal melakukan registrasi" };
@@ -675,5 +727,6 @@ export const dataService = {
   logout() {
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
+    window.dispatchEvent(new Event("subscribe:auth-changed"));
   },
 };

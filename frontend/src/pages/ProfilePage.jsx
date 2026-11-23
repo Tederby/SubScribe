@@ -81,6 +81,12 @@ export default function ProfilePage() {
       }
     }
     loadInitial();
+
+    const handleAuthChange = (e) => {
+      setCurrentUser(e.detail?.user || dataService.getCurrentUser());
+    };
+    window.addEventListener("subscribe:auth-changed", handleAuthChange);
+    return () => window.removeEventListener("subscribe:auth-changed", handleAuthChange);
   }, []);
 
   const handleAddCategory = async (e) => {

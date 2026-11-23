@@ -621,9 +621,9 @@ export default function GroupDetailPage() {
 
       {/* Edit Cluster Modal (z-[70] for safe mobile stacking) */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-          <div className="bg-[#121316] border border-[#2D3035] w-full max-w-lg p-4 sm:p-6 space-y-4 max-h-[88vh] overflow-y-auto pb-12 sm:pb-6 shadow-2xl rounded-sm">
-            <div className="flex items-center justify-between border-b border-[#26282B] pb-2.5">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-sm z-[70] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#121316] border border-[#2D3035] w-full max-w-lg max-h-[65vh] sm:max-h-[82vh] mb-16 sm:mb-0 flex flex-col shadow-2xl rounded-sm">
+            <div className="shrink-0 p-3.5 sm:p-4 border-b border-[#26282B] flex items-center justify-between">
               <span className="text-[#DFFF00] font-mono font-bold text-sm flex items-center gap-2">
                 <Edit3 className="w-4 h-4" /> [ EDIT KONFIGURASI CLUSTER ]
               </span>
@@ -636,127 +636,134 @@ export default function GroupDetailPage() {
               </button>
             </div>
 
-            <form onSubmit={handleSaveEdit} className="space-y-3.5 text-xs font-sans">
-              <div>
-                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                  Nama Cluster Patungan *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={editGroupName}
-                  onChange={(e) => setEditGroupName(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                  Nama Layanan Digital *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={editServiceName}
-                  onChange={(e) => setEditServiceName(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white focus:outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <form onSubmit={handleSaveEdit} className="flex flex-col flex-1 min-h-0">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs font-sans">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                    Nama Penanggung Jawab (PJ) *
+                    Nama Cluster Patungan *
                   </label>
                   <input
                     type="text"
                     required
-                    value={editLeaderName}
-                    onChange={(e) => setEditLeaderName(e.target.value)}
+                    value={editGroupName}
+                    onChange={(e) => setEditGroupName(e.target.value)}
                     className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white focus:outline-none"
                   />
                 </div>
+
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                    No. WhatsApp PJ (628xxx)
+                    Nama Layanan Digital *
                   </label>
                   <input
                     type="text"
-                    placeholder="6281234567890 (Opsional)"
-                    value={editLeaderPhone}
-                    onChange={handleEditPhoneChange}
-                    className={`w-full bg-[#0E0F11] border px-3 py-2 text-white font-mono focus:outline-none ${
-                      editPhoneError ? "border-rose-500" : "border-[#2D3035] focus:border-[#FF4F00]"
-                    }`}
-                  />
-                  {editPhoneError && (
-                    <span className="text-[10px] text-rose-400 block mt-1">{editPhoneError}</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                    Tarif per Orang (Rp) *
-                  </label>
-                  <input
-                    type="number"
                     required
-                    value={editPricePerPerson}
-                    onChange={(e) => setEditPricePerPerson(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white font-mono focus:outline-none"
+                    value={editServiceName}
+                    onChange={(e) => setEditServiceName(e.target.value)}
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white focus:outline-none"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
-                    Tgl Jatuh Tempo (1-31) *
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="31"
-                    required
-                    value={editBillingDay}
-                    onChange={(e) => setEditBillingDay(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white font-mono focus:outline-none"
-                  />
-                </div>
-              </div>
 
-              {editConfirmStep ? (
-                <div className="p-3.5 bg-amber-950/40 border border-[#DFFF00] space-y-2 rounded-sm">
-                  <div className="text-xs text-[#DFFF00] flex items-center gap-1.5 font-bold font-mono">
-                    <AlertTriangle className="w-4 h-4 shrink-0" /> KONFIRMASI PEMBARUAN CLUSTER
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                      Nama Penanggung Jawab (PJ) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={editLeaderName}
+                      onChange={(e) => setEditLeaderName(e.target.value)}
+                      className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white focus:outline-none"
+                    />
                   </div>
-                  <p className="text-xs text-zinc-300 leading-relaxed">
-                    Perubahan tarif atau jatuh tempo akan langsung diterapkan pada seluruh checklist dan broadcast WhatsApp cluster ini.
-                  </p>
-                  <div className="flex gap-2 pt-1 font-mono">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                      No. WhatsApp PJ (628xxx)
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="6281234567890 (Opsional)"
+                      value={editLeaderPhone}
+                      onChange={handleEditPhoneChange}
+                      className={`w-full bg-[#0E0F11] border px-3 py-2 text-white font-mono focus:outline-none ${
+                        editPhoneError ? "border-rose-500" : "border-[#2D3035] focus:border-[#FF4F00]"
+                      }`}
+                    />
+                    {editPhoneError && (
+                      <span className="text-[10px] text-rose-400 block mt-1">{editPhoneError}</span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                      Tarif per Orang (Rp) *
+                    </label>
+                    <input
+                      type="number"
+                      required
+                      value={editPricePerPerson}
+                      onChange={(e) => setEditPricePerPerson(e.target.value)}
+                      className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white font-mono focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                      Tgl Jatuh Tempo (1-31) *
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="31"
+                      required
+                      value={editBillingDay}
+                      onChange={(e) => setEditBillingDay(e.target.value)}
+                      className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white font-mono focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {editConfirmStep && (
+                  <div className="p-3.5 bg-amber-950/40 border border-[#DFFF00] space-y-2 rounded-sm">
+                    <div className="text-xs text-[#DFFF00] flex items-center gap-1.5 font-bold font-mono">
+                      <AlertTriangle className="w-4 h-4 shrink-0" /> KONFIRMASI PEMBARUAN CLUSTER
+                    </div>
+                    <p className="text-xs text-zinc-300 leading-relaxed">
+                      Perubahan tarif atau jatuh tempo akan langsung diterapkan pada seluruh checklist dan broadcast WhatsApp cluster ini.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="shrink-0 p-3 bg-[#0E0F11] border-t border-[#26282B]">
+                {editConfirmStep ? (
+                  <div className="flex gap-2 font-mono">
                     <button
                       type="submit"
                       disabled={savingEdit}
-                      className="flex-1 py-2 bg-[#DFFF00] text-black font-bold uppercase text-xs rounded-sm"
+                      className="flex-1 py-2.5 bg-[#DFFF00] text-black font-bold uppercase text-xs rounded-sm"
                     >
                       {savingEdit ? "MENYIMPAN..." : "[ YA, TERAPKAN PERUBAHAN ]"}
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditConfirmStep(false)}
-                      className="px-4 py-2 bg-zinc-800 text-zinc-300 uppercase text-xs rounded-sm"
+                      className="px-4 py-2.5 bg-zinc-800 text-zinc-300 uppercase text-xs rounded-sm"
                     >
                       [ BATAL ]
                     </button>
                   </div>
-                </div>
-              ) : (
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-[#DFFF00] hover:bg-[#cbe600] text-black font-bold font-mono uppercase tracking-wider text-xs transition-colors mt-2 rounded-sm shadow-md"
-                >
-                  [ REVIEW & SIMPAN PERUBAHAN ]
-                </button>
-              )}
+                ) : (
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-[#DFFF00] hover:bg-[#cbe600] text-black font-bold font-mono uppercase tracking-wider text-xs transition-colors rounded-sm shadow-md"
+                  >
+                    [ REVIEW & SIMPAN PERUBAHAN ]
+                  </button>
+                )}
+              </div>
             </form>
           </div>
         </div>

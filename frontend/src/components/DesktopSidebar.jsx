@@ -16,6 +16,7 @@ export default function DesktopSidebar() {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ services: 0, groups: 0, members: 0 });
   const [cacheKb, setCacheKb] = useState(0);
+  const [currentUser, setCurrentUser] = useState(dataService.getCurrentUser());
 
   useEffect(() => {
     async function loadStats() {
@@ -48,6 +49,12 @@ export default function DesktopSidebar() {
     }
     loadStats();
 
+    const handleAuthChange = (e) => {
+      setCurrentUser(e.detail?.user || dataService.getCurrentUser());
+      loadStats();
+    };
+    window.addEventListener("subscribe:auth-changed", handleAuthChange);
+
     // Listen to keyboard shortcuts: '1' -> /services, '2' -> /groups, '3' -> /profile
     const handleKeyDown = (e) => {
       if (
@@ -63,7 +70,10 @@ export default function DesktopSidebar() {
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("subscribe:auth-changed", handleAuthChange);
+    };
   }, [navigate]);
 
   const navItems = [
@@ -117,6 +127,27 @@ export default function DesktopSidebar() {
               Subscription Tracker
             </div>
           </div>
+        </div>
+
+        {/* Operator Session Info */}
+        <div className="pt-2 border-t border-zinc-800 font-mono text-[10px]">
+          <div className="flex items-center justify-between text-zinc-400 mb-1">
+            <span className="text-[9px] uppercase tracking-wider">OPERATOR // SESI</span>
+            <span className={`w-1.5 h-1.5 rounded-full ${currentUser ? "bg-[#00E676]" : "bg-[#FF4F00]"}`} />
+          </div>
+          {currentUser ? (
+            <div className="bg-[#0E0F11] border border-zinc-800 p-2 rounded-xs">
+              <div className="font-bold text-white truncate text-[11px]">{currentUser.name}</div>
+              <div className="text-[9px] text-[#00E676] truncate">{currentUser.email}</div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between bg-[#0E0F11] border border-zinc-800 p-2 rounded-xs">
+              <span className="text-zinc-500 text-[10px]">BELUM LOGIN</span>
+              <NavLink to="/profile" className="text-[#FF4F00] font-bold hover:underline text-[10px]">
+                [ MASUK ]
+              </NavLink>
+            </div>
+          )}
         </div>
       </div>
 

@@ -18,9 +18,20 @@ create table if not exists services (
   max_slots integer default 1
 );
 
--- 3. Split Groups Table (Active Shared Accounts)
+-- 3. Users Table (Lightweight Credentials for Operator / Admin Auth)
+create table if not exists users (
+  id uuid primary key default gen_random_uuid(),
+  email text unique not null,
+  password_hash text not null,
+  name text not null,
+  role text default 'operator',
+  created_at timestamp with time zone default now()
+);
+
+-- 4. Split Groups Table (Active Shared Accounts, Managed per User)
 create table if not exists split_groups (
   id uuid primary key default gen_random_uuid(),
+  user_id uuid references users(id) on delete cascade,
   group_name text not null,
   service_name text not null,
   leader_name text not null,
@@ -29,16 +40,6 @@ create table if not exists split_groups (
   billing_day integer default 1,
   member_list text, -- Comma-separated names, e.g. "Budi, Andi, Siti"
   paid_members text default '' -- Comma-separated paid members for cycle tracking
-);
-
--- 4. Users Table (Lightweight Credentials for Operator / Admin Auth)
-create table if not exists users (
-  id uuid primary key default gen_random_uuid(),
-  email text unique not null,
-  password_hash text not null,
-  name text not null,
-  role text default 'operator',
-  created_at timestamp with time zone default now()
 );
 
 -- Access Grants & Permissions for API (Bypasses RLS blocks for educational backend MVC)
@@ -178,9 +179,10 @@ insert into services (id, sku, name, description, category_id, monthly_price, ma
 on conflict (sku) do nothing;
 
 -- Insert Sample Split Groups
-insert into split_groups (id, group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members) values
+insert into split_groups (id, user_id, group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members) values
   (
     'b1111111-1111-1111-1111-111111111111',
+    'u1111111-1111-1111-1111-111111111111',
     'Netflix Nonton Bareng Kos',
     'Netflix Premium',
     'Budi Santoso',
@@ -192,6 +194,7 @@ insert into split_groups (id, group_name, service_name, leader_name, leader_phon
   ),
   (
     'b2222222-2222-2222-2222-222222222222',
+    'u1111111-1111-1111-1111-111111111111',
     'Spotify Musikan Circle',
     'Spotify Family',
     'Citra Dewi',

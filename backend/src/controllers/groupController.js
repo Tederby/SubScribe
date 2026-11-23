@@ -3,7 +3,8 @@ import { groupModel } from "../models/groupModel.js";
 export const groupController = {
   async getAll(req, res) {
     try {
-      const data = await groupModel.getAll();
+      const userId = req.user?.id;
+      const data = await groupModel.getAll(userId);
       return res.status(200).json({ success: true, data });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });
@@ -13,9 +14,10 @@ export const groupController = {
   async getById(req, res) {
     try {
       const { id } = req.params;
-      const data = await groupModel.getById(id);
+      const userId = req.user?.id;
+      const data = await groupModel.getById(id, userId);
       if (!data) {
-        return res.status(404).json({ success: false, message: "Grup patungan tidak ditemukan" });
+        return res.status(404).json({ success: false, message: "Grup patungan tidak ditemukan atau bukan milik akun Anda" });
       }
       return res.status(200).json({ success: true, data });
     } catch (error) {
@@ -25,6 +27,7 @@ export const groupController = {
 
   async create(req, res) {
     try {
+      const userId = req.user?.id;
       const { group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members } = req.body;
       if (!group_name || !service_name || !leader_name) {
         return res.status(400).json({
@@ -33,6 +36,7 @@ export const groupController = {
         });
       }
       const payload = {
+        user_id: userId,
         group_name,
         service_name,
         leader_name,
@@ -52,6 +56,7 @@ export const groupController = {
   async update(req, res) {
     try {
       const { id } = req.params;
+      const userId = req.user?.id;
       const { group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members } = req.body;
       const payload = {};
       if (group_name !== undefined) payload.group_name = group_name;
@@ -63,9 +68,9 @@ export const groupController = {
       if (member_list !== undefined) payload.member_list = member_list;
       if (paid_members !== undefined) payload.paid_members = paid_members;
 
-      const data = await groupModel.update(id, payload);
+      const data = await groupModel.update(id, userId, payload);
       if (!data) {
-        return res.status(404).json({ success: false, message: "Grup patungan tidak ditemukan" });
+        return res.status(404).json({ success: false, message: "Grup patungan tidak ditemukan atau bukan milik akun Anda" });
       }
       return res.status(200).json({ success: true, data });
     } catch (error) {
@@ -76,9 +81,10 @@ export const groupController = {
   async remove(req, res) {
     try {
       const { id } = req.params;
-      const data = await groupModel.remove(id);
+      const userId = req.user?.id;
+      const data = await groupModel.remove(id, userId);
       if (!data) {
-        return res.status(404).json({ success: false, message: "Grup patungan tidak ditemukan" });
+        return res.status(404).json({ success: false, message: "Grup patungan tidak ditemukan atau bukan milik akun Anda" });
       }
       return res.status(200).json({ success: true, message: "Grup berhasil dihapus", data });
     } catch (error) {
@@ -86,4 +92,3 @@ export const groupController = {
     }
   }
 };
-
