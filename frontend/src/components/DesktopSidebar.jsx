@@ -69,24 +69,24 @@ export default function DesktopSidebar() {
   const navItems = [
     {
       to: "/services",
-      label: "KATALOG RESMI",
-      sub: "CATALOG_EXPLORER",
+      label: "Katalog Layanan",
+      sub: "KATALOG",
       shortcut: "1",
       icon: Layers,
       count: stats.services,
     },
     {
       to: "/groups",
-      label: "CLUSTER PATUNGAN",
-      sub: "SPLIT_RACK_MANAGER",
+      label: "Grup Patungan",
+      sub: "CLUSTER",
       shortcut: "2",
       icon: Cpu,
       count: stats.groups,
     },
     {
       to: "/profile",
-      label: "DIAGNOSTIK & ADMIN",
-      sub: "APPARATUS_CALIBRATOR",
+      label: "Diagnostik & Auth",
+      sub: "OPERATOR",
       shortcut: "3",
       icon: Terminal,
       count: null,
@@ -96,25 +96,25 @@ export default function DesktopSidebar() {
   return (
     <aside className="hidden lg:flex flex-col w-64 xl:w-72 border-r border-[#26282B] bg-[#0E0F11] p-3.5 space-y-4 shrink-0 select-none">
       {/* Station Brand Panel */}
-      <div className="border border-[#26282B] bg-[#111214] p-3 space-y-2 bracket-frame">
-        <div className="flex items-center justify-between text-[9px] font-mono uppercase text-zinc-400 border-b border-zinc-800 pb-1.5">
+      <div className="border border-[#26282B] bg-[#111214] p-3 space-y-2 rounded-sm">
+        <div className="flex items-center justify-between text-[10px] font-mono uppercase text-zinc-400 border-b border-zinc-800 pb-1.5">
           <span className="flex items-center gap-1.5 text-[#00E676] font-bold">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00E676] ring-1 ring-[#00E676]/50" />
-            STATION // ALPHA-01
+            <span className="w-2 h-2 rounded-full bg-[#00E676]" />
+            STATION // LIVE
           </span>
-          <span className="text-[#FF4F00] font-bold">DESKTOP_CONSOLE</span>
+          <span className="text-[#FF4F00] font-bold font-mono">CONSOLE</span>
         </div>
 
         <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 bg-[#FF4F00] text-black font-black text-lg flex items-center justify-center font-mono">
+          <div className="w-9 h-9 bg-[#FF4F00] text-black font-black text-lg flex items-center justify-center font-mono rounded-sm">
             S
           </div>
           <div>
             <h2 className="text-sm font-bold text-white font-sans tracking-tight">
               SubScribe
             </h2>
-            <div className="text-[9px] font-mono text-zinc-400">
-              TELEM_ENGINE v1.2.0
+            <div className="text-[10px] font-mono text-zinc-400">
+              Subscription Tracker
             </div>
           </div>
         </div>

@@ -27,54 +27,45 @@ export default function App() {
 
   const getRouteCode = () => {
     const p = location.pathname;
-    if (p.startsWith("/services/")) return "SPEC // SERVICE_INSPECTOR";
-    if (p.startsWith("/services")) return "RACK.01 // CATALOG_EXPLORER";
-    if (p.startsWith("/groups/")) return "SPEC // GROUP_INSPECTOR";
-    if (p.startsWith("/groups")) return "RACK.02 // SPLIT_MANAGER";
-    if (p.startsWith("/profile")) return "RACK.03 // APPARATUS_DIAGNOSTICS";
-    return "RACK.00 // STANDBY";
+    if (p.startsWith("/services/")) return "DETAIL // LAYANAN";
+    if (p.startsWith("/services")) return "KATALOG // LAYANAN";
+    if (p.startsWith("/groups/")) return "INSPEKSI // GRUP";
+    if (p.startsWith("/groups")) return "CLUSTER // PATUNGAN";
+    if (p.startsWith("/profile")) return "OPERATOR // DIAGNOSTIK";
+    return "STANDBY";
   };
 
   return (
     <div className="w-full max-w-md lg:max-w-7xl xl:max-w-[1400px] mx-auto min-h-screen bg-[#141517] text-[#E5E5E0] relative border-x lg:border border-[#26282B] lg:shadow-2xl flex flex-col pt-[env(safe-area-inset-top,0px)] lg:my-3">
-      {/* Top Apparatus Telemetry Header (Solid Opaque, Zero Backdrop Blur for 60/120 FPS scrolling) */}
-      <header className="px-3.5 py-2 border-b border-[#26282B] bg-[#0E0F11] flex items-center justify-between font-mono text-[9px] sm:text-[10px] uppercase tracking-wider text-zinc-300 select-none sticky top-0 z-40">
+      {/* Top Telemetry Header */}
+      <header className="px-3.5 py-2 border-b border-[#26282B] bg-[#0E0F11] flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-zinc-300 select-none sticky top-0 z-40">
         <div className="flex items-center gap-2">
           <span
-            className={`w-1.5 h-1.5 rounded-full ring-1 ${
-              isOnline ? "bg-[#00E676] ring-[#00E676]/40" : "bg-[#FF4F00] ring-[#FF4F00]/40"
+            className={`w-2 h-2 rounded-full ring-2 ${
+              isOnline ? "bg-[#00E676] ring-[#00E676]/30" : "bg-[#FF4F00] ring-[#FF4F00]/30"
             }`}
           />
-          <span className="font-bold text-zinc-200">SYS.ID // SUB-01</span>
+          <span className="font-bold text-white tracking-wide">SubScribe</span>
           <span className="text-zinc-600">|</span>
           <TelemetryClock />
-          <span className="hidden md:inline text-zinc-600">|</span>
-          <span className="hidden md:inline text-zinc-400">APPARATUS_CONTROL_DESK</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="hidden sm:inline text-zinc-400">SPEC_REV 2.04</span>
-          <span className="hidden lg:inline text-zinc-600">|</span>
-          <span className="hidden lg:inline text-[#FF4F00] font-bold">
+          <span className="text-[#FF4F00] font-bold">
             {getRouteCode()}
           </span>
+          <span className="text-zinc-600 hidden sm:inline">|</span>
           <span
-            className={`px-1.5 py-0.5 border text-[9px] font-bold tracking-widest ${
+            className={`px-1.5 py-0.5 border text-[9px] font-bold tracking-wider ${
               isOnline
                 ? "bg-zinc-900 border-[#00E676]/60 text-[#00E676]"
                 : "bg-zinc-900 border-[#FF4F00]/60 text-[#FF4F00]"
             }`}
           >
-            {isOnline ? "NET: LIVE" : "NET: CACHE"}
+            {isOnline ? "ONLINE" : "OFFLINE"}
           </span>
         </div>
       </header>
-
-      {/* Secondary Location Telemetry Strip (Mobile only) */}
-      <div className="lg:hidden px-3.5 py-1 bg-[#111214] border-b border-[#26282B] flex items-center justify-between font-mono text-[9px] text-zinc-400 uppercase tracking-widest select-none">
-        <span className="text-[#FF4F00]">{getRouteCode()}</span>
-        <span className="text-zinc-400">[ FIELD_TERMINAL ]</span>
-      </div>
 
       {/* Main Workstation Container (Sidebar + Content) */}
       <div className="flex-1 flex flex-col lg:flex-row min-h-0">

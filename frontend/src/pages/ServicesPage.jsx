@@ -114,110 +114,110 @@ export default function ServicesPage() {
   }, [services]);
 
   return (
-    <div className="space-y-4 font-mono">
+    <div className="space-y-4 font-sans">
       {/* Spec Apparatus Header */}
-      <div className="border border-[#26282B] bg-[#111214] p-3 sm:p-4 relative bracket-frame">
-        <div className="flex items-center justify-between border-b border-[#26282B] pb-2 mb-2 text-[9px] uppercase tracking-wider text-zinc-400">
+      <div className="border border-[#26282B] bg-[#111214] p-3 sm:p-5 relative">
+        <div className="flex items-center justify-between border-b border-[#26282B] pb-2 mb-3 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
           <span className="flex items-center gap-1.5 text-[#FF4F00] font-bold">
-            <Activity className="w-3.5 h-3.5" /> SEC.01 // CATALOG_REGISTRY
+            <span className="w-2 h-2 rounded-full bg-[#FF4F00]" /> KATALOG LAYANAN DIGITAL
           </span>
-          <span className="text-zinc-400 tabular-nums">
-            DATA_ORIGIN: {dataSource.toUpperCase()}
+          <span className="text-zinc-400 font-mono">
+            {services.length} Unit Terdaftar
           </span>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-base sm:text-lg font-bold text-white font-sans uppercase tracking-tight flex items-center gap-2">
-              <Layers className="w-4 h-4 sm:w-5 sm:h-5 text-[#FF4F00]" /> Katalog Layanan Digital
+            <h1 className="text-lg sm:text-xl font-bold text-white uppercase tracking-tight flex items-center gap-2">
+              <Layers className="w-5 h-5 text-[#FF4F00]" /> Katalog Layanan Digital
             </h1>
-            <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5">
-              Unit langganan resmi siap kalkulasi patungan, pembagian slot akun, dan proyeksi efisiensi biaya.
+            <p className="text-xs text-zinc-300 mt-1 max-w-xl leading-relaxed">
+              Daftar paket resmi langganan digital dengan perhitungan slot akun, tarif bulanan, dan estimasi patungan per orang.
             </p>
           </div>
 
-          {/* Prominent Button to add new subscription service */}
+          {/* Button to add new subscription service */}
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-3.5 py-2 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-[10px] sm:text-[11px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shrink-0 active:bg-[#ff651c] shadow-md"
+            className="px-4 py-2.5 bg-[#FF4F00] hover:bg-[#ff651c] text-black font-bold font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shrink-0 active:bg-[#ff651c] shadow-md rounded-sm"
           >
-            <Plus className="w-4 h-4" /> [ + TAMBAH LAYANAN KE KATALOG ]
+            <Plus className="w-4 h-4" /> [ + TAMBAH LAYANAN BARU ]
           </button>
         </div>
 
-        {/* Global Catalog KPI Deck (Responsive: 3 columns) */}
-        <div className="mt-3.5 pt-3 border-t border-dashed border-zinc-800 grid grid-cols-3 gap-1.5 sm:gap-3 text-center select-none">
-          <div className="bg-[#0E0F11] border border-[#26282B] py-2 px-1.5">
-            <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase">INDEXED_UNITS</div>
-            <div className="text-xs sm:text-sm font-bold text-white tabular-nums mt-0.5">
-              {services.length} UNITS
+        {/* Global Catalog KPI Deck */}
+        <div className="mt-4 pt-3 border-t border-dashed border-zinc-800 grid grid-cols-3 gap-2 sm:gap-3 text-center select-none font-mono">
+          <div className="bg-[#0E0F11] border border-[#26282B] py-2 px-2">
+            <div className="text-[10px] text-zinc-400 uppercase">TOTAL LAYANAN</div>
+            <div className="text-sm sm:text-base font-bold text-white tabular-nums mt-0.5">
+              {services.length} Paket
             </div>
           </div>
-          <div className="bg-[#0E0F11] border border-[#26282B] py-2 px-1.5">
-            <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase">CATEGORIES</div>
-            <div className="text-xs sm:text-sm font-bold text-[#DFFF00] tabular-nums mt-0.5">
-              {categories.length} SECTORS
+          <div className="bg-[#0E0F11] border border-[#26282B] py-2 px-2">
+            <div className="text-[10px] text-zinc-400 uppercase">KATEGORI</div>
+            <div className="text-sm sm:text-base font-bold text-[#DFFF00] tabular-nums mt-0.5">
+              {categories.length} Sektor
             </div>
           </div>
-          <div className="bg-[#0E0F11] border border-[#26282B] py-2 px-1.5">
-            <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase">ENTRY_SPLIT</div>
-            <div className="text-xs sm:text-sm font-bold text-[#00E676] tabular-nums mt-0.5">
+          <div className="bg-[#0E0F11] border border-[#26282B] py-2 px-2">
+            <div className="text-[10px] text-zinc-400 uppercase">MULAI PATUNGAN</div>
+            <div className="text-sm sm:text-base font-bold text-[#00E676] tabular-nums mt-0.5">
               {lowestSplitPrice > 0 ? formatRupiah(lowestSplitPrice) : "Rp 0"}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Apparatus Control Desk: Radar Search & Category Filters */}
+      {/* Control Desk: Search & Category Filters */}
       <div className="border border-[#26282B] bg-[#111214] p-3 space-y-2.5">
         <div className="flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
-          {/* Radar Search Input */}
+          {/* Search Input */}
           <div className="relative flex-1">
-            <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-zinc-400">
-              <Search className="w-3.5 h-3.5 text-zinc-400" />
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+              <Search className="w-4 h-4 text-zinc-400" />
             </div>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="RADAR SCAN // CARI NAMA ATAU SKU LAYANAN..."
-              className="w-full bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] pl-8 pr-8 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none uppercase"
+              placeholder="CARI NAMA LAYANAN ATAU SKU..."
+              className="w-full bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] pl-9 pr-8 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none uppercase font-mono"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery("")}
-                className="absolute inset-y-0 right-0 pr-2.5 flex items-center text-zinc-400 hover:text-white"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-white"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="w-4 h-4" />
               </button>
             )}
           </div>
 
-          <div className="text-[9px] text-zinc-400 uppercase tracking-widest hidden sm:block shrink-0">
-            FILTERED: {filteredServices.length} / {services.length}
+          <div className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider hidden sm:block shrink-0">
+            DITEMUKAN: {filteredServices.length} / {services.length}
           </div>
         </div>
 
-        {/* Category Switches (Horizontal scroll on mobile, wrap on desktop) */}
-        <div className="flex items-center gap-1.5 overflow-x-auto sm:flex-wrap pb-1 sm:pb-0 scrollbar-none">
+        {/* Category Switches */}
+        <div className="flex items-center gap-1.5 overflow-x-auto sm:flex-wrap pb-1 sm:pb-0 scrollbar-none font-mono">
           <button
             onClick={() => setSelectedCategory("all")}
-            className={`px-3 py-1.5 text-[10px] uppercase tracking-wider border shrink-0 active:bg-zinc-800 ${
+            className={`px-3 py-1.5 text-[11px] uppercase tracking-wider border shrink-0 transition-colors ${
               selectedCategory === "all"
                 ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
-                : "bg-[#0E0F11] text-zinc-400 border-[#26282B] lg:hover:border-zinc-500 lg:hover:text-zinc-200"
+                : "bg-[#0E0F11] text-zinc-400 border-[#26282B] hover:border-zinc-500 hover:text-zinc-200"
             }`}
           >
-            {selectedCategory === "all" ? "[ ALL_SECTORS ]" : "ALL_SECTORS"}
+            {selectedCategory === "all" ? "[ SEMUA SEKTOR ]" : "SEMUA SEKTOR"}
           </button>
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3 py-1.5 text-[10px] uppercase tracking-wider border shrink-0 active:bg-zinc-800 ${
+              className={`px-3 py-1.5 text-[11px] uppercase tracking-wider border shrink-0 transition-colors ${
                 selectedCategory === cat.id
                   ? "bg-[#FF4F00] text-black border-[#FF4F00] font-bold"
-                  : "bg-[#0E0F11] text-zinc-400 border-[#26282B] lg:hover:border-zinc-500 lg:hover:text-zinc-200"
+                  : "bg-[#0E0F11] text-zinc-400 border-[#26282B] hover:border-zinc-500 hover:text-zinc-200"
               }`}
             >
               {selectedCategory === cat.id ? `[ ${cat.name} ]` : cat.name}
@@ -228,25 +228,25 @@ export default function ServicesPage() {
 
       {/* Catalog Listing Units */}
       {loading ? (
-        <div className="border border-dashed border-zinc-800 p-10 text-center text-xs text-zinc-500 space-y-1">
-          <div>SCANNING_CATALOG_REGISTRY...</div>
-          <div className="text-[10px] text-zinc-600">PLEASE_STANDBY</div>
+        <div className="border border-dashed border-zinc-800 p-10 text-center text-xs text-zinc-400 space-y-1 font-mono">
+          <div>MEMUAT REGISTRY LAYANAN...</div>
+          <div className="text-[10px] text-zinc-500">MENGAMBIL DATA KATALOG</div>
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="border border-dashed border-zinc-800 p-10 text-center space-y-3 text-xs text-zinc-500">
-          <div>NO_SERVICES_MATCHING_FILTER</div>
+        <div className="border border-dashed border-zinc-800 p-10 text-center space-y-3 text-xs text-zinc-400 font-mono">
+          <div>TIDAK ADA LAYANAN YANG SESUAI FILTER</div>
           <button
             onClick={() => {
               setSelectedCategory("all");
               setSearchQuery("");
             }}
-            className="px-3 py-1 bg-[#111214] border border-zinc-700 text-[10px] text-[#FF4F00] uppercase"
+            className="px-3.5 py-1.5 bg-[#111214] border border-zinc-700 text-xs text-[#FF4F00] uppercase hover:border-[#FF4F00]"
           >
-            [ RESET_FILTERS ]
+            [ RESET FILTER ]
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 sm:gap-4">
           {filteredServices.map((service) => {
             const minPerSlot = Math.round(
               service.monthly_price / (service.max_slots || 1)
@@ -255,60 +255,49 @@ export default function ServicesPage() {
               <Link
                 key={service.id}
                 to={`/services/${service.id}`}
-                className="apparatus-card group flex flex-col justify-between bg-[#111214] border border-[#26282B] lg:hover:border-[#FF4F00] p-3.5 sm:p-4 relative overflow-hidden active:bg-[#16181B]"
+                className="group flex flex-col justify-between bg-[#111214] border border-[#26282B] hover:border-[#FF4F00] p-4 relative overflow-hidden active:bg-[#16181B] rounded-sm transition-colors"
               >
-                {/* Desktop hover scanline bar */}
-                <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-[3px] bg-[#FF4F00] scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-150" />
-
-                {/* Corner registration marks */}
-                <div className="absolute top-1 left-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00]">
-                  +
-                </div>
-                <div className="absolute top-1 right-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00]">
-                  +
-                </div>
-
                 <div>
                   <div className="flex justify-between items-start gap-2">
                     <div className="space-y-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[9px] px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold truncate">
+                      <div className="flex items-center gap-1.5 font-mono">
+                        <span className="text-[10px] px-1.5 py-0.5 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold truncate">
                           {service.sku}
                         </span>
-                        <span className="text-[9px] text-[#DFFF00] uppercase tracking-wider font-semibold truncate">
+                        <span className="text-[10px] text-[#DFFF00] uppercase tracking-wider font-semibold truncate">
                           {service.categories?.name || "CAT.GENERAL"}
                         </span>
                       </div>
-                      <h2 className="text-sm sm:text-base font-bold text-white lg:group-hover:text-[#FF4F00] font-sans tracking-tight">
+                      <h2 className="text-base font-bold text-white group-hover:text-[#FF4F00] font-sans tracking-tight">
                         {service.name}
                       </h2>
                     </div>
 
-                    <div className="text-right shrink-0">
-                      <div className="text-xs sm:text-sm font-bold text-[#00E676] tabular-nums">
+                    <div className="text-right shrink-0 font-mono">
+                      <div className="text-sm font-bold text-[#00E676] tabular-nums">
                         {formatRupiah(service.monthly_price)}
                       </div>
-                      <div className="text-[9px] text-zinc-400 uppercase">/ BULAN TOTAL</div>
+                      <div className="text-[9px] text-zinc-400 uppercase">/ bulan total</div>
                     </div>
                   </div>
 
-                  <p className="text-[10px] sm:text-[11px] text-zinc-400 font-sans mt-2 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-zinc-300 font-sans mt-2.5 line-clamp-2 leading-relaxed">
                     {service.description || "Layanan langganan digital dengan dukungan multi-screen profile."}
                   </p>
                 </div>
 
                 {/* Card Telemetry Footer */}
-                <div className="mt-3 pt-2.5 border-t border-dashed border-zinc-800 flex items-center justify-between text-[10px]">
+                <div className="mt-3.5 pt-3 border-t border-dashed border-zinc-800 flex items-center justify-between text-xs font-mono">
                   <div className="text-zinc-400">
-                    <span className="text-zinc-400">EST. SPLIT: </span>
+                    <span>Est. Patungan: </span>
                     <strong className="text-[#DFFF00] tabular-nums">
                       {formatRupiah(minPerSlot)}
                     </strong>
-                    <span className="text-zinc-500 text-[9px]"> ({service.max_slots} SLOTS)</span>
+                    <span className="text-zinc-400 text-[10px]"> ({service.max_slots} Slot)</span>
                   </div>
 
-                  <span className="text-[9px] text-[#FF4F00] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                    [ CALC_SPLIT &gt; ]
+                  <span className="text-[11px] text-[#FF4F00] font-bold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    Simulasi &gt;
                   </span>
                 </div>
               </Link>
@@ -317,26 +306,27 @@ export default function ServicesPage() {
         </div>
       )}
 
-      {/* Modal: Tambah Layanan Baru ke Katalog */}
+      {/* Modal: Tambah Layanan Baru ke Katalog (z-[70] for safe mobile stacking) */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-[#111214] border-2 border-[#26282B] w-full max-w-lg p-4 sm:p-5 space-y-3.5 max-h-[92vh] overflow-y-auto bracket-frame">
-            <div className="flex items-center justify-between border-b border-[#26282B] pb-2 text-xs">
-              <span className="text-[#FF4F00] font-bold text-sm flex items-center gap-2">
-                <Package className="w-4 h-4" /> [ REGISTRY_APPARATUS // TAMBAH_LAYANAN ]
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#121316] border border-[#2D3035] w-full max-w-lg p-4 sm:p-6 space-y-4 max-h-[88vh] overflow-y-auto pb-12 sm:pb-6 shadow-2xl rounded-sm">
+            <div className="flex items-center justify-between border-b border-[#26282B] pb-2.5">
+              <span className="text-[#FF4F00] font-mono font-bold text-sm flex items-center gap-2">
+                <Package className="w-4 h-4" /> [ TAMBAH LAYANAN KE KATALOG ]
               </span>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="text-zinc-500 hover:text-white p-1"
+                className="text-zinc-400 hover:text-white p-1.5 transition-colors"
+                title="Tutup Modal"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateService} className="space-y-3 text-xs">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <form onSubmit={handleCreateService} className="space-y-3.5 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1 font-mono">
                     SKU / KODE UNIK *
                   </label>
                   <input
@@ -345,17 +335,17 @@ export default function ServicesPage() {
                     placeholder="e.g. DISNEY-PREM"
                     value={newSku}
                     onChange={(e) => setNewSku(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white uppercase focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white font-mono uppercase focus:outline-none focus:border-[#FF4F00]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1 font-mono">
                     SEKTOR / KATEGORI *
                   </label>
                   <select
                     value={newCatId}
                     onChange={(e) => setNewCatId(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-zinc-200 focus:outline-none focus:border-[#FF4F00]"
                   >
                     {categories.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -367,8 +357,8 @@ export default function ServicesPage() {
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                  NAMA RESMI LAYANAN *
+                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                  Nama Resmi Layanan *
                 </label>
                 <input
                   type="text"
@@ -376,27 +366,27 @@ export default function ServicesPage() {
                   placeholder="e.g. Disney+ Hotstar Premium"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                  className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white focus:outline-none focus:border-[#FF4F00]"
                 />
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                  DESKRIPSI PAKET & FITUR
+                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                  Deskripsi Paket & Fitur
                 </label>
                 <input
                   type="text"
                   placeholder="e.g. Akses 4K Ultra HD simultan 3 layar profil mandiri"
                   value={newDesc}
                   onChange={(e) => setNewDesc(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                  className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white focus:outline-none focus:border-[#FF4F00]"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    BIAYA BULANAN RESMI (RP) *
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                    Biaya Bulanan Resmi (Rp) *
                   </label>
                   <input
                     type="number"
@@ -404,12 +394,12 @@ export default function ServicesPage() {
                     placeholder="119000"
                     value={newPrice}
                     onChange={(e) => setNewPrice(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white font-mono focus:outline-none focus:border-[#FF4F00]"
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    KAPASITAS MAKSIMAL SLOT AKUN *
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                    Kapasitas Slot Akun *
                   </label>
                   <input
                     type="number"
@@ -418,14 +408,14 @@ export default function ServicesPage() {
                     required
                     value={newSlots}
                     onChange={(e) => setNewSlots(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] px-3 py-2 text-white font-mono focus:outline-none focus:border-[#FF4F00]"
                   />
                 </div>
               </div>
 
               {formFeedback && (
-                <div className="p-2 border border-[#00E676] bg-zinc-900 text-[#00E676] text-[10px] flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <div className="p-2.5 border border-[#00E676] bg-zinc-900 text-[#00E676] text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0" />
                   <span>{formFeedback}</span>
                 </div>
               )}
@@ -433,9 +423,9 @@ export default function ServicesPage() {
               <button
                 type="submit"
                 disabled={submittingService}
-                className="w-full py-2.5 bg-[#FF4F00] hover:bg-[#ff651c] text-black font-bold uppercase tracking-wider text-xs transition-colors active:bg-[#ff651c]"
+                className="w-full py-3 bg-[#FF4F00] hover:bg-[#ff651c] text-black font-bold font-mono uppercase tracking-wider text-xs transition-colors active:bg-[#ff651c] rounded-sm"
               >
-                {submittingService ? "DISPATCHING_UNIT..." : "[ COMMIT_SERVICE_TO_CATALOG ]"}
+                {submittingService ? "MENYIMPAN LAYANAN..." : "[ SIMPAN KE KATALOG RESMI ]"}
               </button>
             </form>
           </div>

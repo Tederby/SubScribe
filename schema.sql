@@ -31,16 +31,31 @@ create table if not exists split_groups (
   paid_members text default '' -- Comma-separated paid members for cycle tracking
 );
 
+-- 4. Users Table (Lightweight Credentials for Operator / Admin Auth)
+create table if not exists users (
+  id uuid primary key default gen_random_uuid(),
+  email text unique not null,
+  password_hash text not null,
+  name text not null,
+  role text default 'operator',
+  created_at timestamp with time zone default now()
+);
+
 -- Access Grants & Permissions for API (Bypasses RLS blocks for educational backend MVC)
 alter table categories disable row level security;
 alter table services disable row level security;
 alter table split_groups disable row level security;
+alter table users disable row level security;
 
 grant usage on schema public to anon, authenticated, service_role;
 grant all on all tables in schema public to anon, authenticated, service_role;
 grant all on all sequences in schema public to anon, authenticated, service_role;
 
--- 4. Initial Seed Data (Indonesian Digital Subscriptions)
+-- 5. Initial Seed Data (Indonesian Digital Subscriptions & Operator)
+-- Insert Seed Operator (Password: admin123)
+insert into users (id, email, password_hash, name, role) values
+  ('u1111111-1111-1111-1111-111111111111', 'admin@subscribe.local', 'a1b2c3d4e5f60718:bb2b5e7fe90a5873b38e440bdb252b705addf3bcf8a822a14f03c6a98d17e8376d0d85c118f6a5e820bc7e84d778197b1d9450e44ca6f1a4e9db1a0b4f44b0f7', 'Operator Admin', 'operator')
+on conflict (email) do nothing;
 -- Insert Categories
 insert into categories (id, name) values
   ('c1111111-1111-1111-1111-111111111111', 'Video Streaming'),

@@ -5,6 +5,8 @@ const STORAGE_KEYS = {
   SERVICES: "subscribe_apparatus_services",
   GROUPS: "subscribe_apparatus_groups",
   SYS_STATE: "subscribe_apparatus_system",
+  AUTH_TOKEN: "subscribe_auth_token",
+  AUTH_USER: "subscribe_auth_user",
 };
 
 /**
@@ -604,5 +606,74 @@ export const dataService = {
     } catch {
       return false;
     }
+  },
+
+  // 4. Lightweight Credential Authentication (Zero-Quota Burden on Supabase)
+  async login(email, password) {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        signal: AbortSignal.timeout(3500),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        saveLocal(STORAGE_KEYS.AUTH_TOKEN, json.data.token);
+        saveLocal(STORAGE_KEYS.AUTH_USER, json.data.user);
+        return { success: true, data: json.data };
+      }
+      return { success: false, message: json.message || "Email atau password tidak sesuai" };
+    } catch {
+      // Local fallback auth for offline student lab demonstrations
+      if (email.toLowerCase() === "admin@subscribe.local" && password === "admin123") {
+        const mockData = {
+          user: {
+            id: "u1111111-1111-1111-1111-111111111111",
+            email: "admin@subscribe.local",
+            name: "Operator Admin (Local)",
+            role: "operator",
+          },
+          token: "local-session-token",
+        };
+        saveLocal(STORAGE_KEYS.AUTH_TOKEN, mockData.token);
+        saveLocal(STORAGE_KEYS.AUTH_USER, mockData.user);
+        return { success: true, data: mockData };
+      }
+      return { success: false, message: "Koneksi ke server backend gagal" };
+    }
+  },
+
+  async register(email, password, name) {
+    try {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name }),
+        signal: AbortSignal.timeout(3500),
+      });
+      const json = await res.json();
+      if (json.success && json.data) {
+        saveLocal(STORAGE_KEYS.AUTH_TOKEN, json.data.token);
+        saveLocal(STORAGE_KEYS.AUTH_USER, json.data.user);
+        return { success: true, data: json.data };
+      }
+      return { success: false, message: json.message || "Gagal melakukan registrasi" };
+    } catch {
+      return { success: false, message: "Koneksi ke server backend gagal" };
+    }
+  },
+
+  getStoredUser() {
+    return loadLocal(STORAGE_KEYS.AUTH_USER, null);
+  },
+
+  getStoredToken() {
+    return loadLocal(STORAGE_KEYS.AUTH_TOKEN, null);
+  },
+
+  logout() {
+    localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
   },
 };

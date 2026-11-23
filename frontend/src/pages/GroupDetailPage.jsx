@@ -619,97 +619,98 @@ export default function GroupDetailPage() {
         </div>
       </div>
 
-      {/* Edit Cluster Modal */}
+      {/* Edit Cluster Modal (z-[70] for safe mobile stacking) */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-[#111214] border-2 border-[#26282B] w-full max-w-lg p-4 sm:p-5 space-y-3.5 max-h-[92vh] overflow-y-auto bracket-frame">
-            <div className="flex items-center justify-between border-b border-[#26282B] pb-2 text-xs">
-              <span className="text-[#DFFF00] font-bold text-sm flex items-center gap-2">
-                <Edit3 className="w-4 h-4" /> [ RECALIBRATE_CLUSTER_CONFIG ]
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#121316] border border-[#2D3035] w-full max-w-lg p-4 sm:p-6 space-y-4 max-h-[88vh] overflow-y-auto pb-12 sm:pb-6 shadow-2xl rounded-sm">
+            <div className="flex items-center justify-between border-b border-[#26282B] pb-2.5">
+              <span className="text-[#DFFF00] font-mono font-bold text-sm flex items-center gap-2">
+                <Edit3 className="w-4 h-4" /> [ EDIT KONFIGURASI CLUSTER ]
               </span>
               <button
                 onClick={() => setShowEditModal(false)}
-                className="text-zinc-500 hover:text-white p-1"
+                className="text-zinc-400 hover:text-white p-1.5 transition-colors"
+                title="Tutup Modal"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveEdit} className="space-y-3 text-xs">
+            <form onSubmit={handleSaveEdit} className="space-y-3.5 text-xs font-sans">
               <div>
-                <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                  NAMA CLUSTER PATUNGAN *
+                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                  Nama Cluster Patungan *
                 </label>
                 <input
                   type="text"
                   required
                   value={editGroupName}
                   onChange={(e) => setEditGroupName(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                  className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                  NAMA LAYANAN DIGITAL *
+                <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                  Nama Layanan Digital *
                 </label>
                 <input
                   type="text"
                   required
                   value={editServiceName}
                   onChange={(e) => setEditServiceName(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                  className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white focus:outline-none"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    NAMA PENANGGUNG JAWAB (PJ) *
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                    Nama Penanggung Jawab (PJ) *
                   </label>
                   <input
                     type="text"
                     required
                     value={editLeaderName}
                     onChange={(e) => setEditLeaderName(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    NO. WHATSAPP PJ (OPSIONAL, 628xxx)
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                    No. WhatsApp PJ (628xxx)
                   </label>
                   <input
                     type="text"
                     placeholder="6281234567890 (Opsional)"
                     value={editLeaderPhone}
                     onChange={handleEditPhoneChange}
-                    className={`w-full bg-[#0E0F11] border px-3 py-1.5 text-white focus:outline-none ${
-                      editPhoneError ? "border-rose-500" : "border-[#26282B] focus:border-[#FF4F00]"
+                    className={`w-full bg-[#0E0F11] border px-3 py-2 text-white font-mono focus:outline-none ${
+                      editPhoneError ? "border-rose-500" : "border-[#2D3035] focus:border-[#FF4F00]"
                     }`}
                   />
                   {editPhoneError && (
-                    <span className="text-[9px] text-rose-400 block mt-0.5">{editPhoneError}</span>
+                    <span className="text-[10px] text-rose-400 block mt-1">{editPhoneError}</span>
                   )}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    TARIF PER KEPALA (RP) *
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                    Tarif per Orang (Rp) *
                   </label>
                   <input
                     type="number"
                     required
                     value={editPricePerPerson}
                     onChange={(e) => setEditPricePerPerson(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white font-mono focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    TGL JATUH TEMPO (1-31) *
+                  <label className="block text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                    Tgl Jatuh Tempo (1-31) *
                   </label>
                   <input
                     type="number"
@@ -718,42 +719,42 @@ export default function GroupDetailPage() {
                     required
                     value={editBillingDay}
                     onChange={(e) => setEditBillingDay(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white font-mono focus:outline-none"
                   />
                 </div>
               </div>
 
               {editConfirmStep ? (
-                <div className="p-3 bg-amber-950/40 border border-[#DFFF00] space-y-2">
-                  <div className="text-[10px] text-[#DFFF00] flex items-center gap-1.5 font-bold">
-                    <AlertTriangle className="w-4 h-4 shrink-0" /> KONFIRMASI PEMBARUAN RACK
+                <div className="p-3.5 bg-amber-950/40 border border-[#DFFF00] space-y-2 rounded-sm">
+                  <div className="text-xs text-[#DFFF00] flex items-center gap-1.5 font-bold font-mono">
+                    <AlertTriangle className="w-4 h-4 shrink-0" /> KONFIRMASI PEMBARUAN CLUSTER
                   </div>
-                  <p className="text-[9px] text-zinc-300 leading-relaxed">
+                  <p className="text-xs text-zinc-300 leading-relaxed">
                     Perubahan tarif atau jatuh tempo akan langsung diterapkan pada seluruh checklist dan broadcast WhatsApp cluster ini.
                   </p>
-                  <div className="flex gap-2 pt-1">
+                  <div className="flex gap-2 pt-1 font-mono">
                     <button
                       type="submit"
                       disabled={savingEdit}
-                      className="flex-1 py-2 bg-[#DFFF00] text-black font-bold uppercase text-[10px]"
+                      className="flex-1 py-2 bg-[#DFFF00] text-black font-bold uppercase text-xs rounded-sm"
                     >
-                      {savingEdit ? "COMMITTING..." : "[ YA, TERAPKAN PERUBAHAN ]"}
+                      {savingEdit ? "MENYIMPAN..." : "[ YA, TERAPKAN PERUBAHAN ]"}
                     </button>
                     <button
                       type="button"
                       onClick={() => setEditConfirmStep(false)}
-                      className="px-3 py-2 bg-zinc-800 text-zinc-300 uppercase text-[10px]"
+                      className="px-4 py-2 bg-zinc-800 text-zinc-300 uppercase text-xs rounded-sm"
                     >
-                      [ KEMBALI ]
+                      [ BATAL ]
                     </button>
                   </div>
                 </div>
               ) : (
                 <button
                   type="submit"
-                  className="w-full py-2.5 bg-[#DFFF00] hover:bg-[#cbe600] text-black font-bold uppercase tracking-wider text-xs transition-colors mt-2"
+                  className="w-full py-3 bg-[#DFFF00] hover:bg-[#cbe600] text-black font-bold font-mono uppercase tracking-wider text-xs transition-colors mt-2 rounded-sm shadow-md"
                 >
-                  [ REVIEW & COMMIT CHANGES ]
+                  [ REVIEW & SIMPAN PERUBAHAN ]
                 </button>
               )}
             </form>

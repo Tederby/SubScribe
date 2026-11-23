@@ -146,6 +146,19 @@ export default function GroupsPage() {
     }
   };
 
+  // Service selection dropdown handler
+  const handleServiceSelectChange = (e) => {
+    const val = e.target.value;
+    if (!val || val === "custom") {
+      return;
+    }
+    const found = services.find((s) => s.id === val);
+    if (found) {
+      setServiceName(found.name);
+      setTotalPrice(found.monthly_price.toString());
+    }
+  };
+
   // Add member chip
   const handleAddMemberChip = () => {
     const trimmed = newMemberInput.trim();
@@ -302,70 +315,61 @@ export default function GroupsPage() {
   }, [groups, searchFilter]);
 
   return (
-    <div className="space-y-4 font-mono">
+    <div className="space-y-4 font-sans">
       {/* Telemetry Header */}
-      <div className="border border-[#26282B] bg-[#111214] p-3 sm:p-4 relative bracket-frame">
-        <div className="flex items-center justify-between border-b border-[#26282B] pb-2 mb-2 text-[9px] uppercase tracking-wider text-zinc-400">
+      <div className="border border-[#26282B] bg-[#111214] p-3 sm:p-5 relative">
+        <div className="flex items-center justify-between border-b border-[#26282B] pb-2 mb-3 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
           <span className="text-[#00E676] flex items-center gap-1.5 font-bold">
-            <Cpu className="w-3.5 h-3.5" /> SEC.02 // SPLIT_RACK_TELEMETRY
+            <span className="w-2 h-2 rounded-full bg-[#00E676]" /> CLUSTER GRUP PATUNGAN
           </span>
-          <span className="text-zinc-400">RACKS: {groups.length} NODES_ACTIVE</span>
+          <span className="text-zinc-400 font-mono">{groups.length} Grup Terdaftar</span>
         </div>
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-base sm:text-lg font-bold text-white font-sans uppercase">
+            <h1 className="text-lg sm:text-xl font-bold text-white uppercase tracking-tight">
               Cluster Grup Patungan
             </h1>
-            <p className="text-[10px] sm:text-[11px] text-zinc-400 mt-0.5">
-              Kelola cluster patungan akun, checklist pembayaran rutin bulanan & broadcast WhatsApp otomatis.
+            <p className="text-xs text-zinc-300 mt-1 max-w-xl leading-relaxed">
+              Pantau tagihan bulanan bersama, checklist status lunas anggota, dan kirim pesan tagihan WhatsApp otomatis.
             </p>
           </div>
 
           <button
             onClick={() => setShowModal(true)}
-            className="px-3.5 py-2 bg-[#FF4F00] lg:hover:bg-[#ff651c] text-black font-bold text-[10px] uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shrink-0 active:bg-[#ff651c] shadow-md"
+            className="px-4 py-2.5 bg-[#FF4F00] hover:bg-[#ff651c] text-black font-bold font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shrink-0 active:bg-[#ff651c] shadow-md rounded-sm"
           >
-            <Plus className="w-3.5 h-3.5" /> [ INITIALIZE_NEW_RACK ]
+            <Plus className="w-4 h-4" /> [ + BUAT GRUP BARU ]
           </button>
         </div>
 
         {/* Global Rack Metrics */}
-        <div className="mt-3.5 pt-3 border-t border-dashed border-zinc-800 grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 select-none">
-          <div className="bg-[#0E0F11] border border-[#26282B] p-2.5 flex items-center justify-between">
-            <div>
-              <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase flex items-center gap-1">
-                <Users className="w-3 h-3 text-[#FF4F00]" /> ANGGOTA TERKELOLA
-              </div>
-              <div className="text-xs sm:text-sm font-bold text-white tabular-nums mt-0.5">
-                {telemetry.totalMembers} HEADS
-              </div>
+        <div className="mt-4 pt-3 border-t border-dashed border-zinc-800 grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3 select-none">
+          <div className="bg-[#0E0F11] border border-[#26282B] p-3">
+            <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-[#FF4F00]" /> ANGGOTA TERKELOLA
             </div>
-            <div className="text-[9px] text-zinc-500 font-mono">POOLED</div>
+            <div className="text-sm sm:text-base font-bold text-white tabular-nums font-mono mt-1">
+              {telemetry.totalMembers} Orang
+            </div>
           </div>
 
-          <div className="bg-[#0E0F11] border border-[#26282B] p-2.5 flex items-center justify-between">
-            <div>
-              <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase flex items-center gap-1">
-                <Wallet className="w-3 h-3 text-[#00E676]" /> SIRKULASI / BULAN
-              </div>
-              <div className="text-xs sm:text-sm font-bold text-[#00E676] tabular-nums mt-0.5">
-                {formatRupiah(telemetry.totalMonthlyPool)}
-              </div>
+          <div className="bg-[#0E0F11] border border-[#26282B] p-3">
+            <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1.5">
+              <Wallet className="w-3.5 h-3.5 text-[#00E676]" /> SIRKULASI / BULAN
             </div>
-            <div className="text-[9px] text-zinc-500 font-mono">FLOW</div>
+            <div className="text-sm sm:text-base font-bold text-[#00E676] tabular-nums font-mono mt-1">
+              {formatRupiah(telemetry.totalMonthlyPool)}
+            </div>
           </div>
 
-          <div className="hidden lg:flex bg-[#0E0F11] border border-[#26282B] p-2.5 items-center justify-between">
-            <div>
-              <div className="text-[9px] sm:text-[10px] text-zinc-400 uppercase flex items-center gap-1">
-                <Calendar className="w-3 h-3 text-[#DFFF00]" /> JATUH TEMPO AKTIF
-              </div>
-              <div className="text-xs sm:text-sm font-bold text-[#DFFF00] tabular-nums mt-0.5">
-                {groups.filter((g) => calculateDueDays(g.billing_day).isUrgent).length} SEGERA
-              </div>
+          <div className="hidden lg:block bg-[#0E0F11] border border-[#26282B] p-3">
+            <div className="text-[10px] text-zinc-400 font-mono uppercase flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-[#DFFF00]" /> JATUH TEMPO DEKAT
             </div>
-            <div className="text-[9px] text-zinc-500 font-mono">CYCLE</div>
+            <div className="text-sm sm:text-base font-bold text-[#DFFF00] tabular-nums font-mono mt-1">
+              {groups.filter((g) => calculateDueDays(g.billing_day).isUrgent).length} Perlu Perhatian
+            </div>
           </div>
         </div>
       </div>
@@ -377,32 +381,32 @@ export default function GroupsPage() {
             type="text"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            placeholder="FILTER CLUSTER RACK..."
-            className="flex-1 bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] px-3 py-1.5 text-xs text-white placeholder-zinc-500 focus:outline-none uppercase"
+            placeholder="CARI NAMA GRUP, LAYANAN, ATAU PENANGGUNG JAWAB..."
+            className="flex-1 bg-[#0E0F11] border border-[#26282B] focus:border-[#FF4F00] px-3 py-2 text-xs text-white placeholder-zinc-500 focus:outline-none uppercase font-mono"
           />
-          <span className="text-[9px] text-zinc-400 hidden sm:inline">
-            SHOWING: {filteredGroups.length} OF {groups.length}
+          <span className="text-[10px] text-zinc-400 font-mono hidden sm:inline">
+            MENAMPILKAN {filteredGroups.length} DARI {groups.length}
           </span>
         </div>
       )}
 
       {/* Active Groups Rack */}
       {loading ? (
-        <div className="border border-dashed border-zinc-800 p-10 text-center text-xs text-zinc-500 space-y-1">
-          <div>SCANNING_RACK_NODES...</div>
-          <div className="text-[10px] text-zinc-600">POLLING_NODES</div>
+        <div className="border border-dashed border-zinc-800 p-10 text-center text-xs text-zinc-400 space-y-1 font-mono">
+          <div>MEMUAT DATA GRUP PATUNGAN...</div>
+          <div className="text-[10px] text-zinc-500">MENGAMBIL DARI REGISTRY</div>
         </div>
       ) : groups.length === 0 ? (
-        <div className="border border-dashed border-zinc-800 p-10 text-center space-y-3 text-xs text-zinc-500">
-          <div>NO_ACTIVE_GROUPS_REGISTERED</div>
-          <p className="text-[10px] text-zinc-600 max-w-xs mx-auto">
-            Buat cluster patungan pertama untuk memantau anggota, tanggal jatuh tempo, dan checklist pembayaran.
+        <div className="border border-dashed border-zinc-800 p-10 text-center space-y-3 text-xs text-zinc-400">
+          <div className="font-mono text-zinc-300">BELUM ADA GRUP PATUNGAN</div>
+          <p className="text-xs text-zinc-400 max-w-sm mx-auto leading-relaxed">
+            Buat cluster patungan pertama untuk memantau anggota, tanggal jatuh tempo, dan checklist pembayaran rutin.
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="px-3 py-1.5 bg-[#FF4F00] text-black font-bold text-[10px] uppercase tracking-wider active:bg-[#ff651c]"
+            className="px-4 py-2 bg-[#FF4F00] text-black font-bold text-xs uppercase tracking-wider font-mono active:bg-[#ff651c] shadow"
           >
-            [ INITIALIZE FIRST GROUP &gt; ]
+            [ + INISIALISASI GRUP PERTAMA ]
           </button>
         </div>
       ) : (
@@ -421,46 +425,36 @@ export default function GroupsPage() {
               <Link
                 key={group.id}
                 to={`/groups/${group.id}`}
-                className="apparatus-card group flex flex-col justify-between bg-[#111214] border border-[#26282B] lg:hover:border-[#FF4F00] p-3.5 sm:p-4 relative transition-colors overflow-hidden active:bg-[#16181B]"
+                className="group flex flex-col justify-between bg-[#111214] border border-[#26282B] hover:border-[#FF4F00] p-4 relative transition-colors overflow-hidden active:bg-[#16181B] rounded-sm"
               >
-                {/* Desktop hover scanline bar */}
-                <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-[3px] bg-[#FF4F00] scale-y-0 group-hover:scale-y-100 origin-top transition-transform duration-150" />
-
-                <div className="absolute top-1 left-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00]">
-                  +
-                </div>
-                <div className="absolute top-1 right-1.5 text-[8px] text-zinc-600 lg:group-hover:text-[#FF4F00]">
-                  +
-                </div>
-
                 <div>
                   <div className="flex justify-between items-start gap-2">
-                    <div>
-                      <span className="text-[9px] text-[#DFFF00] uppercase tracking-wider font-bold">
+                    <div className="min-w-0">
+                      <span className="text-[10px] text-[#DFFF00] uppercase tracking-wider font-mono font-bold block truncate">
                         {group.service_name}
                       </span>
-                      <h2 className="text-sm sm:text-base font-bold text-white lg:group-hover:text-[#FF4F00] font-sans mt-0.5">
+                      <h2 className="text-base font-bold text-white group-hover:text-[#FF4F00] font-sans mt-0.5 truncate">
                         {group.group_name}
                       </h2>
                     </div>
 
                     <div className="text-right shrink-0">
-                      <div className="text-xs sm:text-sm font-bold text-[#00E676] tabular-nums">
+                      <div className="text-sm font-bold text-[#00E676] tabular-nums font-mono">
                         {formatRupiah(group.price_per_person)}
                       </div>
-                      <div className="text-[9px] text-zinc-400 uppercase">/ KEPALA / BLN</div>
+                      <div className="text-[9px] text-zinc-400 font-mono uppercase">/ orang / bln</div>
                     </div>
                   </div>
 
                   {/* Progress bar and status strip */}
-                  <div className="mt-3 pt-2.5 border-t border-dashed border-zinc-800 space-y-2">
-                    <div className="flex items-center justify-between text-[9px] text-zinc-400">
-                      <span className="flex items-center gap-1">
-                        <ShieldCheck className="w-3 h-3 text-[#FF4F00]" />
-                        PJ: <strong className="text-zinc-200">{group.leader_name}</strong>
+                  <div className="mt-3.5 pt-3 border-t border-dashed border-zinc-800 space-y-2">
+                    <div className="flex items-center justify-between text-xs text-zinc-300">
+                      <span className="flex items-center gap-1.5 truncate">
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#FF4F00] shrink-0" />
+                        PJ: <strong className="text-white font-medium truncate">{group.leader_name}</strong>
                       </span>
                       <span
-                        className={`px-1.5 py-0.5 border text-[9px] font-bold ${
+                        className={`px-2 py-0.5 border text-[10px] font-mono font-bold shrink-0 ${
                           isSettled
                             ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
                             : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
@@ -471,27 +465,27 @@ export default function GroupsPage() {
                     </div>
 
                     {/* Schedule Bar with accurate calendar days */}
-                    <div className="flex items-center justify-between text-[9px] text-zinc-400">
-                      <span className="text-zinc-400">
-                        ROSTER: <strong className="text-zinc-300">{members.length} ORANG</strong>
+                    <div className="flex items-center justify-between text-xs text-zinc-400 font-mono">
+                      <span>
+                        Anggota: <strong className="text-zinc-200">{members.length} orang</strong>
                       </span>
                       <span
                         className={`flex items-center gap-1 font-bold ${
                           dueInfo.isUrgent ? "text-[#FF4F00]" : "text-[#DFFF00]"
                         }`}
                       >
-                        <Calendar className="w-3 h-3" />
-                        TGL {group.billing_day} ({dueInfo.label})
+                        <Calendar className="w-3.5 h-3.5" />
+                        Tgl {group.billing_day} ({dueInfo.label})
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Inspect Action Footer */}
-                <div className="mt-3 pt-2 border-t border-[#26282B] flex items-center justify-between text-[9px] text-zinc-400">
-                  <span>ID: {group.id.slice(0, 8)}</span>
-                  <span className="flex items-center text-[#FF4F00] font-bold lg:group-hover:translate-x-1 transition-transform">
-                    [ INSPECT_RACK ] <ArrowUpRight className="w-3 h-3 ml-0.5" />
+                <div className="mt-3.5 pt-2.5 border-t border-[#26282B] flex items-center justify-between text-xs text-zinc-400 font-mono">
+                  <span className="text-[10px] text-zinc-500">ID: {group.id.slice(0, 8)}</span>
+                  <span className="flex items-center text-[#FF4F00] font-bold group-hover:translate-x-0.5 transition-transform">
+                    Kelola Grup <ArrowUpRight className="w-3.5 h-3.5 ml-1" />
                   </span>
                 </div>
               </Link>
@@ -500,144 +494,168 @@ export default function GroupsPage() {
         </div>
       )}
 
-      {/* Industrial Apparatus Initializer Modal */}
+      {/* Industrial Apparatus Initializer Modal (z-[70] to prevent BottomNav overlap) */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-3 sm:p-4">
-          <div className="bg-[#111214] border-2 border-[#26282B] w-full max-w-lg p-4 sm:p-5 space-y-3.5 max-h-[92vh] overflow-y-auto bracket-frame">
-            <div className="flex items-center justify-between border-b border-[#26282B] pb-2 text-xs">
-              <span className="text-[#FF4F00] font-bold text-sm">
-                [ RACK_INITIALIZER // REGISTRASI_CLUSTER ]
-              </span>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+          <div className="bg-[#121316] border border-[#2D3035] w-full max-w-lg p-4 sm:p-6 space-y-4 max-h-[88vh] overflow-y-auto pb-12 sm:pb-6 shadow-2xl rounded-sm">
+            <div className="flex items-center justify-between border-b border-[#26282B] pb-2.5">
+              <div>
+                <span className="text-[#FF4F00] font-mono font-bold text-sm block">
+                  [ BUAT CLUSTER PATUNGAN BARU ]
+                </span>
+                <span className="text-[11px] text-zinc-400">
+                  Daftarkan kelompok patungan dan tentukan skema biayanya
+                </span>
+              </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-zinc-500 lg:hover:text-white p-1"
+                className="text-zinc-400 hover:text-white p-1.5 transition-colors"
+                title="Tutup Modal"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
-              {/* Nama Grup & Layanan */}
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs font-sans">
+              {/* 1. Nama Grup / Subscription (Bisa Custom) */}
               <div>
-                <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                  NAMA CLUSTER PATUNGAN *
-                </label>
+                <div className="flex justify-between items-baseline mb-1">
+                  <label className="text-xs font-semibold text-zinc-200 uppercase tracking-wide">
+                    Nama Grup / Subscription *
+                  </label>
+                  <span className="text-[10px] text-zinc-400">Julukan custom</span>
+                </div>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Netflix Kosan Bareng"
+                  placeholder="Misal: Spotify Bareng Kosan, Netflix Family Circle"
                   value={groupName}
                   onChange={(e) => setGroupName(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                  className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white text-xs placeholder-zinc-600 focus:outline-none transition-colors"
                 />
+                <span className="text-[10px] text-zinc-400 block mt-1">
+                  Beri nama kelompok patungan ini agar mudah dikenali.
+                </span>
               </div>
 
-              <div>
-                <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                  NAMA LAYANAN DIGITAL *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Netflix Premium"
-                  value={serviceName}
-                  onChange={(e) => setServiceName(e.target.value)}
-                  className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
-                />
-                {services.length > 0 && (
-                  <div className="flex gap-1 overflow-x-auto pt-1.5 scrollbar-none">
-                    {services.map((s) => (
-                      <button
-                        type="button"
-                        key={s.id}
-                        onClick={() => {
-                          setServiceName(s.name);
-                          setTotalPrice(s.monthly_price.toString());
-                        }}
-                        className="text-[9px] px-2 py-0.5 bg-[#0E0F11] border border-zinc-800 text-zinc-300 lg:hover:text-white shrink-0 active:bg-zinc-800"
-                      >
-                        + {s.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Data PJ (Leader) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {/* 2. Pilihan Layanan Digital: Dropdown Katalog ATAU Custom */}
+              <div className="p-3 bg-[#0E0F11] border border-[#26282B] space-y-3">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1 flex items-center gap-1">
-                    <User className="w-3 h-3 text-[#FF4F00]" /> PENANGGUNG JAWAB (PJ) *
+                  <div className="flex justify-between items-baseline mb-1">
+                    <label className="text-xs font-semibold text-zinc-200 uppercase tracking-wide">
+                      Pilih dari Katalog Layanan
+                    </label>
+                    <span className="text-[10px] text-[#00E676] font-mono">1 Layanan Dipilih</span>
+                  </div>
+
+                  <select
+                    onChange={handleServiceSelectChange}
+                    defaultValue=""
+                    className="w-full bg-[#141517] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-zinc-200 text-xs focus:outline-none transition-colors"
+                  >
+                    <option value="">-- Pilih Layanan dari Katalog --</option>
+                    {services.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name} — {formatRupiah(s.monthly_price)} / bln ({s.max_slots} slot)
+                      </option>
+                    ))}
+                    <option value="custom">-- Layanan Kustom / Lainnya (Ketik Manual) --</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-zinc-300 uppercase tracking-wide mb-1">
+                    Nama Layanan Resmi / Kustom *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="Budi Santoso"
+                    placeholder="e.g. Spotify Premium Family, Netflix Premium 4K"
+                    value={serviceName}
+                    onChange={(e) => setServiceName(e.target.value)}
+                    className="w-full bg-[#141517] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white text-xs placeholder-zinc-600 focus:outline-none transition-colors"
+                  />
+                  <span className="text-[10px] text-zinc-400 block mt-1">
+                    Nama paket langganan yang akan dibagi bersama anggota.
+                  </span>
+                </div>
+              </div>
+
+              {/* 3. Data PJ (Penanggung Jawab) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-200 uppercase tracking-wide mb-1 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-[#FF4F00]" /> Penanggung Jawab (PJ) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nama Anda (e.g. Budi Santoso)"
                     value={leaderName}
                     onChange={(e) => setLeaderName(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white text-xs placeholder-zinc-600 focus:outline-none transition-colors"
                   />
-                  <div className="mt-1 flex items-center gap-1.5">
+                  <div className="mt-1.5 flex items-center gap-2">
                     <input
                       type="checkbox"
                       id="leaderInc"
                       checked={leaderIncluded}
                       onChange={(e) => setLeaderIncluded(e.target.checked)}
-                      className="accent-[#FF4F00] cursor-pointer"
+                      className="accent-[#FF4F00] cursor-pointer w-3.5 h-3.5"
                     />
-                    <label htmlFor="leaderInc" className="text-[9px] text-zinc-400 cursor-pointer">
-                      PJ ikut langganan (masuk daftar patungan)
+                    <label htmlFor="leaderInc" className="text-[11px] text-zinc-300 cursor-pointer">
+                      PJ ikut langganan (masuk hitungan slot)
                     </label>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1 flex items-center gap-1">
-                    <Phone className="w-3 h-3 text-[#00E676]" /> NO. WHATSAPP PJ (OPSIONAL)
+                  <label className="block text-xs font-semibold text-zinc-200 uppercase tracking-wide mb-1 flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-[#00E676]" /> No. WhatsApp PJ (Opsional)
                   </label>
                   <input
                     type="text"
-                    placeholder="6281234567890 (Opsional)"
+                    placeholder="6281234567890"
                     value={leaderPhone}
                     onChange={handlePhoneChange}
-                    className={`w-full bg-[#0E0F11] border px-3 py-1.5 text-white focus:outline-none ${
-                      phoneError ? "border-rose-500" : "border-[#26282B] focus:border-[#FF4F00]"
+                    className={`w-full bg-[#0E0F11] border px-3 py-2 text-white text-xs font-mono placeholder-zinc-600 focus:outline-none transition-colors ${
+                      phoneError ? "border-rose-500" : "border-[#2D3035] focus:border-[#FF4F00]"
                     }`}
                   />
                   {phoneError ? (
-                    <span className="text-[9px] text-rose-400 block mt-0.5">
+                    <span className="text-[10px] text-rose-400 block mt-1">
                       {phoneError}
                     </span>
                   ) : (
-                    <span className="text-[9px] text-zinc-500 block mt-0.5">
-                      Boleh dikosongkan. Jika diisi, gunakan format 628xxx
+                    <span className="text-[10px] text-zinc-400 block mt-1">
+                      Format 628xxx (digunakan untuk template pesan tagihan)
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Total Tarif Langganan Bulanan & Tanggal Jatuh Tempo */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {/* 4. Total Tarif Langganan Bulanan & Tanggal Jatuh Tempo */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    TOTAL BIAYA RESMI BULANAN (RP) *
+                  <label className="block text-xs font-semibold text-zinc-200 uppercase tracking-wide mb-1">
+                    Total Biaya Bulanan (Rp) *
                   </label>
                   <input
                     type="number"
                     required
-                    placeholder="186000"
+                    placeholder="Contoh: 186000"
                     value={totalPrice}
                     onChange={(e) => setTotalPrice(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white text-xs font-mono placeholder-zinc-600 focus:outline-none transition-colors"
                   />
-                  <span className="text-[9px] text-zinc-500 block mt-0.5">
-                    Web otomatis membagi rata ke anggota
+                  <span className="text-[10px] text-zinc-400 block mt-1">
+                    Otomatis dibagi rata ke seluruh anggota
                   </span>
                 </div>
 
                 <div>
-                  <label className="block text-[9px] uppercase tracking-wider text-zinc-400 mb-1">
-                    TGL JATUH TEMPO SETIAP BULAN (1-31) *
+                  <label className="block text-xs font-semibold text-zinc-200 uppercase tracking-wide mb-1">
+                    Tgl Jatuh Tempo Bulanan (1-31) *
                   </label>
                   <input
                     type="number"
@@ -646,34 +664,35 @@ export default function GroupsPage() {
                     required
                     value={billingDay}
                     onChange={(e) => setBillingDay(e.target.value)}
-                    className="w-full bg-[#0E0F11] border border-[#26282B] px-3 py-1.5 text-white focus:outline-none focus:border-[#FF4F00]"
+                    className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-2 text-white text-xs font-mono placeholder-zinc-600 focus:outline-none transition-colors"
                   />
+                  <span className="text-[10px] text-zinc-400 block mt-1">
+                    Tanggal tagihan berulang setiap bulan
+                  </span>
                 </div>
               </div>
 
-              {/* Enhanced Member Tag / Chip Editor */}
-              <div className="border border-[#26282B] bg-[#0E0F11] p-3 space-y-2">
-                <div className="flex justify-between items-center text-[10px] uppercase text-zinc-400">
-                  <span className="font-bold text-white flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5 text-[#FF4F00]" /> DAFTAR ANGGOTA ROSTER ({activeRoster.length} ORANG)
+              {/* 5. Anggota Patungan Roster */}
+              <div className="border border-[#26282B] bg-[#0E0F11] p-3 space-y-2.5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-semibold text-zinc-200 flex items-center gap-1.5 uppercase tracking-wide">
+                    <Users className="w-3.5 h-3.5 text-[#FF4F00]" /> Anggota Roster ({activeRoster.length} Orang)
                   </span>
-                  <span className="text-[#DFFF00]">TEKAN ENTER / TAMBAH</span>
+                  <span className="text-[10px] text-zinc-400 font-mono">Pisahkan dengan koma</span>
                 </div>
 
                 {/* Chips Container */}
-                <div className="flex flex-wrap gap-1.5 min-h-[36px] p-2 bg-[#141517] border border-[#26282B]">
+                <div className="flex flex-wrap gap-1.5 min-h-[38px] p-2 bg-[#141517] border border-[#26282B]">
                   {leaderIncluded && (
-                    <div className="px-2 py-0.5 bg-[#FF4F00]/20 border border-[#FF4F00] text-[#FF4F00] text-[10px] flex items-center gap-1.5">
-                      <span className="font-bold">
-                        [PJ] {leaderName.trim() || "Penanggung Jawab"}
-                      </span>
+                    <div className="px-2 py-1 bg-[#FF4F00]/15 border border-[#FF4F00] text-[#FF4F00] text-xs font-medium flex items-center gap-1.5 rounded-sm">
+                      <span>[PJ] {leaderName.trim() || "Penanggung Jawab"}</span>
                       <button
                         type="button"
                         onClick={() => setLeaderIncluded(false)}
                         className="text-zinc-400 hover:text-white"
                         title="Keluarkan PJ dari daftar patungan"
                       >
-                        <X className="w-3 h-3" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   )}
@@ -681,21 +700,22 @@ export default function GroupsPage() {
                   {memberChips.map((m, idx) => (
                     <div
                       key={idx}
-                      className="px-2 py-0.5 bg-zinc-900 border border-zinc-700 text-zinc-200 text-[10px] flex items-center gap-1.5"
+                      className="px-2 py-1 bg-zinc-900 border border-zinc-700 text-zinc-200 text-xs flex items-center gap-1.5 rounded-sm"
                     >
                       <span>{m}</span>
                       <button
                         type="button"
                         onClick={() => handleRemoveMemberChip(m)}
-                        className="text-zinc-500 hover:text-rose-400"
+                        className="text-zinc-400 hover:text-rose-400"
+                        title="Hapus anggota"
                       >
-                        <X className="w-3 h-3" />
+                        <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))}
 
                   {activeRoster.length === 0 && (
-                    <span className="text-[10px] text-zinc-600 self-center">
+                    <span className="text-xs text-zinc-400 self-center">
                       Belum ada anggota. Centang PJ atau masukkan nama teman di bawah.
                     </span>
                   )}
@@ -705,7 +725,7 @@ export default function GroupsPage() {
                 <div className="flex gap-2">
                   <input
                     type="text"
-                    placeholder="Ketik nama anggota (e.g. Andi Pratama)..."
+                    placeholder="Ketik nama teman (e.g. Andi Pratama)..."
                     value={newMemberInput}
                     onChange={(e) => setNewMemberInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -714,49 +734,51 @@ export default function GroupsPage() {
                         handleAddMemberChip();
                       }
                     }}
-                    className="flex-1 bg-[#111214] border border-[#26282B] px-3 py-1.5 text-white placeholder-zinc-600 focus:outline-none focus:border-[#FF4F00] text-[10px]"
+                    className="flex-1 bg-[#141517] border border-[#2D3035] px-3 py-1.5 text-white placeholder-zinc-600 focus:outline-none focus:border-[#FF4F00] text-xs"
                   />
                   <button
                     type="button"
                     onClick={handleAddMemberChip}
-                    className="px-3 py-1.5 bg-zinc-800 hover:bg-[#FF4F00] hover:text-black border border-zinc-700 text-zinc-200 text-[10px] uppercase font-bold shrink-0 transition-colors"
+                    className="px-3.5 py-1.5 bg-zinc-800 hover:bg-[#FF4F00] hover:text-black border border-zinc-700 text-zinc-200 text-xs font-bold uppercase shrink-0 transition-colors rounded-sm"
                   >
-                    + TAMBAH
+                    + Tambah
                   </button>
                 </div>
               </div>
 
-              {/* Dynamic Telemetry Calculation Display */}
-              <div className="lcd-screen p-3 border border-zinc-800 space-y-1.5 select-none">
-                <div className="flex justify-between items-center text-[10px]">
-                  <span className="text-zinc-400">TOTAL BIAYA BULANAN:</span>
-                  <span className="text-white font-bold tabular-nums">
+              {/* 6. Dynamic Telemetry Calculation Display */}
+              <div className="lcd-screen p-3 space-y-2 select-none border border-zinc-800 rounded-sm">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-zinc-300">Total Biaya Bulanan:</span>
+                  <span className="text-white font-bold font-mono tabular-nums">
                     {formatRupiah(Number(totalPrice) || 0)}
                   </span>
                 </div>
-                <div className="flex justify-between items-center text-[10px]">
-                  <span className="text-zinc-400">JUMLAH ANGGOTA:</span>
-                  <span className="text-[#DFFF00] font-bold tabular-nums">
-                    {activeRoster.length} ORANG {leaderIncluded ? "(TERMASUK PJ)" : "(TANPA PJ)"}
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-zinc-300">Jumlah Slot Anggota:</span>
+                  <span className="text-[#DFFF00] font-bold font-mono tabular-nums">
+                    {activeRoster.length} Orang {leaderIncluded ? "(Termasuk PJ)" : "(Tanpa PJ)"}
                   </span>
                 </div>
-                <div className="pt-1.5 border-t border-dashed border-zinc-800 flex justify-between items-center">
-                  <span className="text-[10px] text-zinc-400 uppercase font-bold">
-                    TARIF OTOMATIS PER KEPALA:
+                <div className="pt-2 border-t border-dashed border-zinc-800 flex justify-between items-center">
+                  <span className="text-xs font-bold text-zinc-200 uppercase tracking-wide">
+                    Biaya Patungan per Orang:
                   </span>
-                  <span className="text-sm font-bold text-[#00E676] tabular-nums">
-                    {formatRupiah(calculatedPricePerPerson)} / bln
+                  <span className="text-sm font-bold text-[#00E676] font-mono tabular-nums">
+                    {formatRupiah(calculatedPricePerPerson)} / bulan
                   </span>
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full py-3 bg-[#FF4F00] lg:hover:bg-[#ff651c] disabled:bg-zinc-800 text-black font-bold uppercase tracking-wider text-xs transition-colors mt-2 active:bg-[#ff651c] shadow-lg"
-              >
-                {submitting ? "RECORDING_RACK..." : "[ COMMIT_NEW_GROUP ]"}
-              </button>
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="w-full py-3 bg-[#FF4F00] hover:bg-[#ff651c] disabled:bg-zinc-800 text-black font-bold font-mono uppercase tracking-wider text-xs transition-colors active:bg-[#ff651c] shadow-lg rounded-sm"
+                >
+                  {submitting ? "MENYIMPAN GRUP..." : "[ COMMIT // SIMPAN GRUP PATUNGAN ]"}
+                </button>
+              </div>
             </form>
           </div>
         </div>

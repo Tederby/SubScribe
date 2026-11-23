@@ -12,6 +12,11 @@ import {
   HardDrive,
   Wifi,
   Package,
+  Lock,
+  User,
+  LogIn,
+  LogOut,
+  Key,
 } from "lucide-react";
 import { dataService } from "../services/dataService";
 
@@ -38,6 +43,15 @@ export default function ProfilePage() {
   const [storageBytes, setStorageBytes] = useState(0);
   const [isStandalone, setIsStandalone] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
+
+  // Operator Auth state
+  const [currentUser, setCurrentUser] = useState(() => dataService.getStoredUser());
+  const [authMode, setAuthMode] = useState("login"); // 'login' | 'register'
+  const [authEmail, setAuthEmail] = useState("");
+  const [authPassword, setAuthPassword] = useState("");
+  const [authName, setAuthName] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authFeedback, setAuthFeedback] = useState(null);
 
   useEffect(() => {
     async function loadInitial() {
@@ -122,6 +136,51 @@ export default function ProfilePage() {
     } finally {
       setSrvSubmitting(false);
     }
+  };
+
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthFeedback(null);
+    try {
+      if (authMode === "login") {
+        const res = await dataService.login(authEmail, authPassword);
+        if (res.success && res.data) {
+          setCurrentUser(res.data.user);
+          setAuthFeedback({ type: "success", text: `Login berhasil sebagai ${res.data.user.name}` });
+          setAuthEmail("");
+          setAuthPassword("");
+        } else {
+          setAuthFeedback({ type: "error", text: res.message || "Email atau password salah" });
+        }
+      } else {
+        if (!authName.trim()) {
+          setAuthFeedback({ type: "error", text: "Nama operator wajib diisi" });
+          setAuthLoading(false);
+          return;
+        }
+        const res = await dataService.register(authEmail, authPassword, authName);
+        if (res.success && res.data) {
+          setCurrentUser(res.data.user);
+          setAuthFeedback({ type: "success", text: `Akun ${res.data.user.name} berhasil didaftarkan!` });
+          setAuthEmail("");
+          setAuthPassword("");
+          setAuthName("");
+        } else {
+          setAuthFeedback({ type: "error", text: res.message || "Gagal mendaftarkan akun" });
+        }
+      }
+    } catch {
+      setAuthFeedback({ type: "error", text: "Terjadi kesalahan pada layanan autentikasi" });
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    dataService.logout();
+    setCurrentUser(null);
+    setAuthFeedback({ type: "success", text: "Sesi operator telah ditutup" });
   };
 
   const handleFactoryReset = () => {
@@ -229,38 +288,189 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Developer Identification Panel */}
-          <div className="border border-[#26282B] bg-[#111214] p-3.5 sm:p-4 space-y-2.5 relative">
-            <div className="absolute top-1 left-1.5 text-[8px] text-zinc-600">+</div>
-            <div className="absolute top-1 right-1.5 text-[8px] text-zinc-600">+</div>
-
-            <div className="text-[9px] font-bold text-zinc-400 uppercase tracking-wider border-b border-zinc-800 pb-1.5 flex items-center gap-1.5">
-              <Cpu className="w-3.5 h-3.5 text-[#FF4F00]" /> OPERATOR_CREDENTIALS
+          {/* Operator Authentication & Credentials Panel (Simple Email & Password) */}
+          <div className="border border-[#26282B] bg-[#111214] p-3.5 sm:p-4 space-y-3 rounded-sm">
+            <div className="text-xs font-bold font-mono text-zinc-300 uppercase tracking-wider border-b border-zinc-800 pb-2 flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-[#FF4F00]">
+                <Key className="w-3.5 h-3.5" /> FITUR KREDENSIAL OPERATOR
+              </span>
+              <span className={`px-1.5 py-0.5 border text-[9px] font-bold ${
+                currentUser ? "border-[#00E676] text-[#00E676]" : "border-zinc-700 text-zinc-400"
+              }`}>
+                {currentUser ? "TERAUTENTIKASI" : "STANDBY"}
+              </span>
             </div>
 
-            <div className="space-y-1.5 text-[11px]">
+            {currentUser ? (
+              /* Authenticated User Status */
+              <div className="space-y-2.5 text-xs">
+                <div className="p-3 bg-[#0E0F11] border border-zinc-800 space-y-1.5">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-zinc-400">Nama Operator:</span>
+                    <strong className="text-white font-medium">{currentUser.name}</strong>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-zinc-400">Email Akun:</span>
+                    <span className="text-[#DFFF00] font-mono">{currentUser.email}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-zinc-400">Role Sistem:</span>
+                    <span className="text-[#00E676] font-mono uppercase font-bold">{currentUser.role || "Operator"}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-zinc-400">Status Token:</span>
+                    <span className="text-zinc-300 font-mono text-[10px]">Aktif (Node Crypto Session)</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-2 bg-zinc-800 hover:bg-rose-950/60 hover:text-rose-400 border border-zinc-700 text-zinc-300 font-mono text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors rounded-sm"
+                >
+                  <LogOut className="w-3.5 h-3.5" /> [ KELUAR SESI // LOGOUT ]
+                </button>
+              </div>
+            ) : (
+              /* Login & Register Form */
+              <div className="space-y-3">
+                <div className="flex border border-zinc-800 p-0.5 bg-[#0E0F11]">
+                  <button
+                    type="button"
+                    onClick={() => { setAuthMode("login"); setAuthFeedback(null); }}
+                    className={`flex-1 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition-colors ${
+                      authMode === "login"
+                        ? "bg-[#FF4F00] text-black"
+                        : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    Masuk (Login)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setAuthMode("register"); setAuthFeedback(null); }}
+                    className={`flex-1 py-1.5 text-[11px] font-mono font-bold uppercase tracking-wider transition-colors ${
+                      authMode === "register"
+                        ? "bg-[#FF4F00] text-black"
+                        : "text-zinc-400 hover:text-white"
+                    }`}
+                  >
+                    Daftar (Register)
+                  </button>
+                </div>
+
+                <form onSubmit={handleAuthSubmit} className="space-y-2.5 text-xs">
+                  {authMode === "register" && (
+                    <div>
+                      <label className="block text-[11px] text-zinc-300 font-medium mb-1">
+                        Nama Lengkap *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Nama Operator"
+                        value={authName}
+                        onChange={(e) => setAuthName(e.target.value)}
+                        className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-1.5 text-white text-xs focus:outline-none"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-[11px] text-zinc-300 font-medium mb-1">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="operator@subscribe.local"
+                      value={authEmail}
+                      onChange={(e) => setAuthEmail(e.target.value)}
+                      className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-1.5 text-white text-xs font-mono focus:outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] text-zinc-300 font-medium mb-1">
+                      Password (min. 6 karakter) *
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      placeholder="••••••••"
+                      value={authPassword}
+                      onChange={(e) => setAuthPassword(e.target.value)}
+                      className="w-full bg-[#0E0F11] border border-[#2D3035] focus:border-[#FF4F00] px-3 py-1.5 text-white text-xs focus:outline-none"
+                    />
+                  </div>
+
+                  {authFeedback && (
+                    <div
+                      className={`p-2 border text-xs flex items-center gap-1.5 ${
+                        authFeedback.type === "success"
+                          ? "bg-zinc-900 border-[#00E676] text-[#00E676]"
+                          : "bg-zinc-900 border-[#FF4F00] text-[#FF4F00]"
+                      }`}
+                    >
+                      {authFeedback.type === "success" ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                      ) : (
+                        <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                      )}
+                      <span>{authFeedback.text}</span>
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={authLoading}
+                    className="w-full py-2 bg-[#FF4F00] hover:bg-[#ff651c] disabled:bg-zinc-800 text-black font-bold font-mono text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors rounded-sm"
+                  >
+                    {authLoading ? (
+                      "MEMPROSES..."
+                    ) : authMode === "login" ? (
+                      <><LogIn className="w-3.5 h-3.5" /> [ MASUK SESI OPERATOR ]</>
+                    ) : (
+                      <><User className="w-3.5 h-3.5" /> [ REGISTRASI KREDENSIAL ]</>
+                    )}
+                  </button>
+
+                  <p className="text-[10px] text-zinc-500 font-mono text-center pt-0.5">
+                    Demo cepat: <span className="text-zinc-300">admin@subscribe.local</span> / <span className="text-zinc-300">admin123</span>
+                  </p>
+                </form>
+              </div>
+            )}
+          </div>
+
+          {/* Developer Identification Panel */}
+          <div className="border border-[#26282B] bg-[#111214] p-3.5 sm:p-4 space-y-2.5 rounded-sm">
+            <div className="text-[10px] font-bold font-mono text-zinc-400 uppercase tracking-wider border-b border-zinc-800 pb-1.5 flex items-center gap-1.5">
+              <Cpu className="w-3.5 h-3.5 text-[#FF4F00]" /> IDENTITAS PENGEMBANG
+            </div>
+
+            <div className="space-y-1.5 text-xs">
               <div className="flex justify-between items-center py-1 border-b border-dashed border-zinc-900">
-                <span className="text-zinc-400">OPERATOR:</span>
-                <span className="text-white font-bold font-sans">Muhammad Afiffatin Hariz</span>
+                <span className="text-zinc-400">Pengembang:</span>
+                <span className="text-white font-medium font-sans">Muhammad Afiffatin Hariz</span>
               </div>
 
               <div className="flex justify-between items-center py-1 border-b border-dashed border-zinc-900">
-                <span className="text-zinc-400">STUDENT_NIM:</span>
+                <span className="text-zinc-400">NIM Mahasiswa:</span>
                 <span className="text-zinc-200 font-mono">21120124130073</span>
               </div>
 
               <div className="flex justify-between items-center py-1 border-b border-dashed border-zinc-900">
-                <span className="text-zinc-400">DEPARTMENT:</span>
+                <span className="text-zinc-400">Program Studi:</span>
                 <span className="text-zinc-200">Teknik Komputer Undip 2024</span>
               </div>
 
               <div className="flex justify-between items-center py-1">
-                <span className="text-zinc-400">SOURCE_HUB:</span>
+                <span className="text-zinc-400">Repository:</span>
                 <a
                   href="https://github.com/Tederby/SubScribe"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#DFFF00] hover:underline flex items-center gap-1 text-[10px]"
+                  className="text-[#DFFF00] hover:underline flex items-center gap-1 font-mono text-[11px]"
                 >
                   <GitBranch className="w-3 h-3" /> [ GITHUB_REPO ]
                 </a>

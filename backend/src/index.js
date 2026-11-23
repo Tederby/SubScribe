@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import serviceRoutes from "./routes/serviceRoutes.js";
 import groupRoutes from "./routes/groupRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.get("/api/health", (req, res) => {
 });
 
 // Mount Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/groups", groupRoutes);
