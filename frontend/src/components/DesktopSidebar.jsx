@@ -16,7 +16,9 @@ export default function DesktopSidebar() {
   const navigate = useNavigate();
   const [stats, setStats] = useState({ services: 0, groups: 0, members: 0 });
   const [cacheKb, setCacheKb] = useState(0);
-  const [currentUser, setCurrentUser] = useState(dataService.getCurrentUser());
+  const [currentUser, setCurrentUser] = useState(() =>
+    dataService?.getCurrentUser ? dataService.getCurrentUser() : null
+  );
 
   useEffect(() => {
     async function loadStats() {

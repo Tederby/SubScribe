@@ -13,7 +13,9 @@ import { dataService } from "./services/dataService";
 export default function App() {
   const location = useLocation();
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [currentUser, setCurrentUser] = useState(dataService.getCurrentUser());
+  const [currentUser, setCurrentUser] = useState(() =>
+    dataService?.getCurrentUser ? dataService.getCurrentUser() : null
+  );
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);

@@ -657,6 +657,15 @@ export const dataService = {
     }
   },
 
+  notifyAuthChanged(user = null) {
+    if (typeof window !== "undefined") {
+      const activeUser = user !== undefined ? user : this.getStoredUser();
+      window.dispatchEvent(
+        new CustomEvent("subscribe:auth-changed", { detail: { user: activeUser } })
+      );
+    }
+  },
+
   // 4. Lightweight Credential Authentication (Zero-Quota Burden on Supabase)
   async login(email, password) {
     try {
@@ -670,7 +679,7 @@ export const dataService = {
       if (json.success && json.data) {
         saveLocal(STORAGE_KEYS.AUTH_TOKEN, json.data.token);
         saveLocal(STORAGE_KEYS.AUTH_USER, json.data.user);
-        window.dispatchEvent(new Event("subscribe:auth-changed"));
+        this.notifyAuthChanged(json.data.user);
         return { success: true, data: json.data };
       }
       return { success: false, message: json.message || "Email atau password tidak sesuai" };
@@ -688,7 +697,7 @@ export const dataService = {
         };
         saveLocal(STORAGE_KEYS.AUTH_TOKEN, mockData.token);
         saveLocal(STORAGE_KEYS.AUTH_USER, mockData.user);
-        window.dispatchEvent(new Event("subscribe:auth-changed"));
+        this.notifyAuthChanged(mockData.user);
         return { success: true, data: mockData };
       }
       return { success: false, message: "Koneksi ke server backend gagal" };
@@ -707,7 +716,7 @@ export const dataService = {
       if (json.success && json.data) {
         saveLocal(STORAGE_KEYS.AUTH_TOKEN, json.data.token);
         saveLocal(STORAGE_KEYS.AUTH_USER, json.data.user);
-        window.dispatchEvent(new Event("subscribe:auth-changed"));
+        this.notifyAuthChanged(json.data.user);
         return { success: true, data: json.data };
       }
       return { success: false, message: json.message || "Gagal melakukan registrasi" };
@@ -720,13 +729,21 @@ export const dataService = {
     return loadLocal(STORAGE_KEYS.AUTH_USER, null);
   },
 
+  getCurrentUser() {
+    return this.getStoredUser();
+  },
+
   getStoredToken() {
     return loadLocal(STORAGE_KEYS.AUTH_TOKEN, null);
+  },
+
+  getCurrentToken() {
+    return this.getStoredToken();
   },
 
   logout() {
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
-    window.dispatchEvent(new Event("subscribe:auth-changed"));
+    this.notifyAuthChanged(null);
   },
 };
