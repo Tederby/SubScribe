@@ -50,8 +50,8 @@ jobs:
             # Accept all licenses
             yes | "$CMDLINE_BIN" --licenses || true
 
-            # Install Android 34 platform
-            yes | "$CMDLINE_BIN" --install "platforms;android-34" || true
+            # Install Android 36 and build-tools 36.1.0 required by Bubblewrap compileSdkVersion 36
+            yes | "$CMDLINE_BIN" --install "platforms;android-36" "build-tools;36.1.0" || true
           fi
 
           # Ensure build-tools 36.1.0 directory exists for Bubblewrap
