@@ -123,6 +123,12 @@ jobs:
 
           kill $SRV_PID 2>/dev/null || true
 
+          # Ensure minSdkVersion is at least 24 to satisfy androidbrowserhelper >= 2.7.4
+          if [ -f app/build.gradle ]; then
+            echo "Ensuring minSdkVersion 24 in app/build.gradle..."
+            sed -i -E 's/minSdkVersion [0-9]+/minSdkVersion 24/g' app/build.gradle
+          fi
+
           echo "Compiling and signing release APK & App Bundle..."
           echo "Y" | bubblewrap build
 

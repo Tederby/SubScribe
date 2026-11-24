@@ -22,6 +22,7 @@
   },
   "appVersionCode": 1,
   "appVersionName": "1.0.0",
+  "minSdkVersion": 24,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://subscribe-frontend-five.vercel.app/manifest.webmanifest",
