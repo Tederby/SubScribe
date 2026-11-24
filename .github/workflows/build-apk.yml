@@ -28,13 +28,39 @@ jobs:
 
       - name: Setup Android SDK Environment
         run: |
-          echo "ANDROID_HOME=/usr/local/lib/android/sdk" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
-          # Accept Android SDK licenses
-          SDKMANAGER=$(find /usr/local/lib/android/sdk/cmdline-tools -name sdkmanager -type f 2>/dev/null | head -n 1)
-          if [ -n "$SDKMANAGER" ]; then
-            echo "Found sdkmanager at: $SDKMANAGER"
-            yes | "$SDKMANAGER" --licenses || true
+          # Grant full permissions to runner user
+          sudo chown -R $USER:$USER /usr/local/lib/android/sdk
+          
+          export ANDROID_HOME=/usr/local/lib/android/sdk
+          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+
+          # Dynamically locate cmdline-tools
+          CMDLINE_BIN=$(find $ANDROID_HOME/cmdline-tools -name sdkmanager -type f 2>/dev/null | head -n 1)
+          if [ -n "$CMDLINE_BIN" ]; then
+            CMDLINE_DIR=$(dirname $(dirname "$CMDLINE_BIN"))
+            echo "Found cmdline-tools at: $CMDLINE_DIR"
+            echo "$CMDLINE_DIR/bin" >> $GITHUB_PATH
+            echo "$ANDROID_HOME/platform-tools" >> $GITHUB_PATH
+
+            # Bubblewrap expects sdkPath/bin/sdkmanager or sdkPath/tools/bin/sdkmanager
+            ln -sf "$CMDLINE_DIR/bin" "$ANDROID_HOME/bin"
+            ln -sf "$CMDLINE_DIR" "$ANDROID_HOME/tools"
+
+            # Accept all licenses
+            yes | "$CMDLINE_BIN" --licenses || true
+
+            # Install Android 34 platform
+            yes | "$CMDLINE_BIN" --install "platforms;android-34" || true
+          fi
+
+          # Ensure build-tools 36.1.0 directory exists for Bubblewrap
+          if [ ! -d "$ANDROID_HOME/build-tools/36.1.0" ]; then
+            LATEST_BT=$(ls -d $ANDROID_HOME/build-tools/* 2>/dev/null | sort -V | tail -n 1)
+            if [ -n "$LATEST_BT" ]; then
+              echo "Aliasing latest build-tools ($LATEST_BT) to 36.1.0 for Bubblewrap..."
+              ln -sf "$LATEST_BT" "$ANDROID_HOME/build-tools/36.1.0"
+            fi
           fi
 
       - name: Setup Android Keystore
@@ -72,7 +98,15 @@ jobs:
       - name: Configure Bubblewrap Environment
         run: |
           mkdir -p ~/.bubblewrap
-          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+          cat << EOF > ~/.bubblewrap/config.json
+          {
+            "jdkPath": "${JAVA_HOME}",
+            "androidSdkPath": "/usr/local/lib/android/sdk"
+          }
+          EOF
+          cat ~/.bubblewrap/config.json
+          echo "Verifying environment with bubblewrap doctor..."
+          bubblewrap doctor
 
       - name: Build Android Project with Bubblewrap
         env:
@@ -90,19 +124,21 @@ jobs:
           echo "Scaffolding / updating Android TWA project..."
           bubblewrap update --skipVersionUpgrade
 
-          # Restore production iconUrl
+          # Restore production iconUrl and synchronize checksum so build never prompts
           sed -i 's|http://127.0.0.1:8080/pwa-512x512.png|https://subscribe-frontend-five.vercel.app/pwa-512x512.png|g' twa-manifest.json
+          sha1sum twa-manifest.json | awk '{print $1}' > manifest-checksum.txt
 
           kill $SRV_PID 2>/dev/null || true
 
-          echo "Compiling and signing release APK..."
+          echo "Compiling and signing release APK & App Bundle..."
           bubblewrap build
 
-      - name: Upload Signed APK Artifact
+      - name: Upload Signed APK & Bundle Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: SubScribe-Apparatus-APK
           path: |
             app-release-signed.apk
+            app-release-bundle.aab
             android.keystore
           if-no-files-found: error
