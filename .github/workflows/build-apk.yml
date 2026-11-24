@@ -1,0 +1,100 @@
+name: Build Android APK (TWA)
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-apk:
+    name: Build Signed TWA APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Android Keystore
+        id: keystore-setup
+        run: |
+          if [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
+            echo "Using keystore provided in GitHub Secrets..."
+            echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > ./android.keystore
+            echo "KEYSTORE_PASS=${{ secrets.KEYSTORE_PASSWORD }}" >> $GITHUB_ENV
+            echo "KEY_PASS=${{ secrets.KEY_PASSWORD }}" >> $GITHUB_ENV
+            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> $GITHUB_ENV
+          else
+            echo "No ANDROID_KEYSTORE_BASE64 found in secrets. Generating standard dedicated keystore..."
+            keytool -genkeypair -v -keystore ./android.keystore -alias subscribe \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass "subscribepass" -keypass "subscribepass" \
+              -dname "CN=SubScribe, OU=Apparatus, O=SubScribe, L=Jakarta, ST=DKI, C=ID"
+            echo "KEYSTORE_PASS=subscribepass" >> $GITHUB_ENV
+            echo "KEY_PASS=subscribepass" >> $GITHUB_ENV
+            echo "KEY_ALIAS=subscribe" >> $GITHUB_ENV
+          fi
+
+          # Output Certificate Fingerprint
+          SHA256=$(keytool -list -v -keystore ./android.keystore -alias "${KEY_ALIAS:-subscribe}" -storepass "${KEYSTORE_PASS:-subscribepass}" | grep "SHA256:" | head -n 1 | awk '{print $2}')
+          echo "SHA256_FINGERPRINT=$SHA256" >> $GITHUB_ENV
+          echo "### 📱 Android APK Build Telemetry" >> $GITHUB_STEP_SUMMARY
+          echo "- **Package ID:** \`com.subscribe.apparatus\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Key Alias:** \`${KEY_ALIAS:-subscribe}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Certificate SHA-256:** \`$SHA256\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **AssetLinks Status:** Configured at \`frontend/public/.well-known/assetlinks.json\`" >> $GITHUB_STEP_SUMMARY
+
+      - name: Install Bubblewrap CLI
+        run: npm install -g @bubblewrap/cli
+
+      - name: Configure Bubblewrap Environment
+        run: |
+          mkdir -p ~/.bubblewrap
+          echo "{\"jdkPath\":\"$JAVA_HOME\",\"androidSdkPath\":\"$ANDROID_HOME\"}" > ~/.bubblewrap/config.json
+
+      - name: Build Android Project with Bubblewrap
+        env:
+          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASS }}
+          BUBBLEWRAP_KEY_PASSWORD: ${{ env.KEY_PASS }}
+        run: |
+          # Start background static server for local icon resolution
+          python3 -m http.server 8080 --directory frontend/public &
+          SRV_PID=$!
+          sleep 2
+
+          # Temporarily substitute iconUrl to local server during scaffold update
+          sed -i 's|https://subscribe-frontend-five.vercel.app/pwa-512x512.png|http://127.0.0.1:8080/pwa-512x512.png|g' twa-manifest.json
+
+          echo "Scaffolding / updating Android TWA project..."
+          bubblewrap update --skipVersionUpgrade
+
+          # Restore production iconUrl
+          sed -i 's|http://127.0.0.1:8080/pwa-512x512.png|https://subscribe-frontend-five.vercel.app/pwa-512x512.png|g' twa-manifest.json
+
+          kill $SRV_PID 2>/dev/null || true
+
+          echo "Compiling and signing release APK..."
+          bubblewrap build
+
+      - name: Upload Signed APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SubScribe-Apparatus-APK
+          path: |
+            app-release-signed.apk
+            android.keystore
+          if-no-files-found: error

@@ -1,0 +1,43 @@
+{
+  "packageId": "com.subscribe.apparatus",
+  "host": "subscribe-frontend-five.vercel.app",
+  "name": "SubScribe Apparatus",
+  "launcherName": "SubScribe",
+  "display": "standalone",
+  "themeColor": "#141517",
+  "themeColorDark": "#0E0F11",
+  "navigationColor": "#0E0F11",
+  "navigationColorDark": "#0E0F11",
+  "navigationDividerColor": "#24272E",
+  "navigationDividerColorDark": "#24272E",
+  "backgroundColor": "#0E0F11",
+  "enableNotifications": true,
+  "startUrl": "/",
+  "iconUrl": "https://subscribe-frontend-five.vercel.app/pwa-512x512.png",
+  "maskableIconUrl": "https://subscribe-frontend-five.vercel.app/pwa-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android.keystore",
+    "alias": "subscribe"
+  },
+  "appVersionCode": 1,
+  "appVersionName": "1.0.0",
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://subscribe-frontend-five.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "orientation": "portrait"
+}

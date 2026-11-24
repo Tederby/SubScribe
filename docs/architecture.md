@@ -45,6 +45,9 @@ SubScribe follows a two-tier monorepo architecture:
   - `viewport-fit=cover` with safe-area insets (`env(safe-area-inset-top)` / `env(safe-area-inset-bottom)`).
   - Touch latency optimization (`touch-action: manipulation`, tap-highlight removal).
   - Offline asset caching and runtime API caching via Workbox in `vite-plugin-pwa`.
+  - **Android TWA Packaging (Trusted Web Activity):** Bundled via `@bubblewrap/cli` with `twa-manifest.json` pointing to `https://subscribe-frontend-five.vercel.app`.
+  - **Digital Asset Links:** `.well-known/assetlinks.json` configured in `frontend/public/` for automatic Chrome address bar suppression.
+  - **Automated CI/CD:** GitHub Actions workflow (`.github/workflows/build-apk.yml`) building signed release `.apk` artifacts with Keystore fallback and telemetry summaries.
 - **Data Resilience Layer:**
   - `dataService.js` coordinates client-side caching with graceful failover to Indonesian seed presets when backend connectivity is offline.
   - Live vs Cache telemetry status displayed in real time on the apparatus header.
