@@ -13,8 +13,8 @@
   "backgroundColor": "#0E0F11",
   "enableNotifications": true,
   "startUrl": "/",
-  "iconUrl": "https://subscribe-frontend-five.vercel.app/pwa-512x512.png",
-  "maskableIconUrl": "https://subscribe-frontend-five.vercel.app/pwa-512x512.png",
+  "iconUrl": "http://127.0.0.1:8080/pwa-512x512.png",
+  "maskableIconUrl": "http://127.0.0.1:8080/pwa-512x512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "./android.keystore",

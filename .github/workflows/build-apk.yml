@@ -118,20 +118,13 @@ jobs:
           SRV_PID=$!
           sleep 2
 
-          # Temporarily substitute iconUrl to local server during scaffold update
-          sed -i 's|https://subscribe-frontend-five.vercel.app/pwa-512x512.png|http://127.0.0.1:8080/pwa-512x512.png|g' twa-manifest.json
-
           echo "Scaffolding / updating Android TWA project..."
           bubblewrap update --skipVersionUpgrade
-
-          # Restore production iconUrl and synchronize checksum so build never prompts
-          sed -i 's|http://127.0.0.1:8080/pwa-512x512.png|https://subscribe-frontend-five.vercel.app/pwa-512x512.png|g' twa-manifest.json
-          sha1sum twa-manifest.json | awk '{print $1}' > manifest-checksum.txt
 
           kill $SRV_PID 2>/dev/null || true
 
           echo "Compiling and signing release APK & App Bundle..."
-          bubblewrap build
+          echo "Y" | bubblewrap build
 
       - name: Upload Signed APK & Bundle Artifacts
         uses: actions/upload-artifact@v4
