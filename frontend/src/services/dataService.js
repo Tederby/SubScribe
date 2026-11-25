@@ -1,4 +1,32 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const CACHE_TTL_MS = 30_000;
+const _memCache = new Map();
+const _inflight = new Map();
+
+function getFreshMemCache(key) {
+  const entry = _memCache.get(key);
+  if (entry && Date.now() - entry.ts < CACHE_TTL_MS) {
+    return entry.value;
+  }
+  return null;
+}
+
+function setMemCache(key, value) {
+  _memCache.set(key, { value, ts: Date.now() });
+}
+
+function invalidateMemCache(prefix) {
+  for (const key of _memCache.keys()) {
+    if (key.startsWith(prefix)) _memCache.delete(key);
+  }
+}
+
+function dedupeRequest(key, fetcher) {
+  if (_inflight.has(key)) return _inflight.get(key);
+  const promise = fetcher().finally(() => _inflight.delete(key));
+  _inflight.set(key, promise);
+  return promise;
+}
 
 const STORAGE_KEYS = {
   CATEGORIES: "subscribe_apparatus_categories",
@@ -231,27 +259,55 @@ export const dataService = {
     return user && user.email === "admin@subscribe.local" ? INITIAL_GROUPS : [];
   },
 
+  // Synchronous cache readers for instant 0ms tab switching
+  getCachedCategories() {
+    return getFreshMemCache("categories")?.data ?? loadLocal(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
+  },
+
+  getCachedServices() {
+    return getFreshMemCache("services")?.data ?? loadLocal(STORAGE_KEYS.SERVICES, INITIAL_SERVICES);
+  },
+
+  getCachedGroups() {
+    const user = this.getStoredUser();
+    if (!user) return [];
+    const mem = getFreshMemCache(`groups:${user.id}`);
+    if (mem) return mem.data;
+    return loadLocal(this.getUserGroupKey(), this.getUserInitialGroups());
+  },
+
   // 1. Categories
-  async getCategories() {
-    try {
-      const res = await fetch(`${API_URL}/api/categories`, { signal: AbortSignal.timeout(8000) });
-      const json = await res.json();
-      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-        // Safe offline merge: preserve locally created categories (id starting with c-)
-        const cached = loadLocal(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
-        const localOnly = cached.filter((c) => c.id.startsWith("c-") && !json.data.some((b) => b.id === c.id));
-        const merged = [...json.data, ...localOnly];
-        saveLocal(STORAGE_KEYS.CATEGORIES, merged);
-        return { data: merged, source: "live" };
-      }
-    } catch {
-      // fallback to local cache
+  async getCategories({ force = false } = {}) {
+    if (!force) {
+      const mem = getFreshMemCache("categories");
+      if (mem) return mem;
     }
-    const cached = loadLocal(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
-    return { data: cached, source: "cache" };
+
+    return dedupeRequest("categories", async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/categories`, { signal: AbortSignal.timeout(8000) });
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          const cached = loadLocal(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
+          const localOnly = cached.filter((c) => c.id.startsWith("c-") && !json.data.some((b) => b.id === c.id));
+          const merged = [...json.data, ...localOnly];
+          saveLocal(STORAGE_KEYS.CATEGORIES, merged);
+          const result = { data: merged, source: "live" };
+          setMemCache("categories", result);
+          return result;
+        }
+      } catch {
+        // fallback to local cache
+      }
+      const cached = loadLocal(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
+      const result = { data: cached, source: "cache" };
+      setMemCache("categories", result);
+      return result;
+    });
   },
 
   async createCategory(name) {
+    invalidateMemCache("categories");
     const newCat = {
       id: `c-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
       name: name.trim(),
@@ -282,23 +338,33 @@ export const dataService = {
   },
 
   // 2. Services
-  async getServices() {
-    try {
-      const res = await fetch(`${API_URL}/api/services`, { signal: AbortSignal.timeout(8000) });
-      const json = await res.json();
-      if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-        // Safe merge: keep local services created offline
-        const cached = loadLocal(STORAGE_KEYS.SERVICES, INITIAL_SERVICES);
-        const localOnly = cached.filter((c) => c.id.startsWith("s-") && !json.data.some((b) => b.id === c.id));
-        const merged = [...json.data, ...localOnly];
-        saveLocal(STORAGE_KEYS.SERVICES, merged);
-        return { data: merged, source: "live" };
-      }
-    } catch {
-      // fallback
+  async getServices({ force = false } = {}) {
+    if (!force) {
+      const mem = getFreshMemCache("services");
+      if (mem) return mem;
     }
-    const cached = loadLocal(STORAGE_KEYS.SERVICES, INITIAL_SERVICES);
-    return { data: cached, source: "cache" };
+
+    return dedupeRequest("services", async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/services`, { signal: AbortSignal.timeout(8000) });
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          const cached = loadLocal(STORAGE_KEYS.SERVICES, INITIAL_SERVICES);
+          const localOnly = cached.filter((c) => c.id.startsWith("s-") && !json.data.some((b) => b.id === c.id));
+          const merged = [...json.data, ...localOnly];
+          saveLocal(STORAGE_KEYS.SERVICES, merged);
+          const result = { data: merged, source: "live" };
+          setMemCache("services", result);
+          return result;
+        }
+      } catch {
+        // fallback
+      }
+      const cached = loadLocal(STORAGE_KEYS.SERVICES, INITIAL_SERVICES);
+      const result = { data: cached, source: "cache" };
+      setMemCache("services", result);
+      return result;
+    });
   },
 
   async getServiceById(id) {
@@ -316,6 +382,7 @@ export const dataService = {
   },
 
   async createService(payload) {
+    invalidateMemCache("services");
     const categories = loadLocal(STORAGE_KEYS.CATEGORIES, INITIAL_CATEGORIES);
     const cat = categories.find((c) => c.id === payload.category_id);
     const newService = {
@@ -354,54 +421,66 @@ export const dataService = {
   },
 
   // 3. Groups (Scoped per authenticated User)
-  async getGroups() {
+  async getGroups({ force = false } = {}) {
     const user = this.getStoredUser();
     if (!user) {
       return { data: [], source: "auth_required" };
     }
 
+    const cacheKey = `groups:${user.id}`;
+    if (!force) {
+      const mem = getFreshMemCache(cacheKey);
+      if (mem) return mem;
+    }
+
     const storageKey = this.getUserGroupKey();
     const fallbackGroups = this.getUserInitialGroups();
 
-    try {
-      const res = await fetch(`${API_URL}/api/groups`, {
-        headers: { ...this.getAuthHeaders() },
-        signal: AbortSignal.timeout(8000),
-      });
-      const json = await res.json();
-      if (json.success && Array.isArray(json.data)) {
-        const cached = loadLocal(storageKey, fallbackGroups);
-        const localOnlyGroups = cached.filter(
-          (c) => c.id.startsWith("g-") && !json.data.some((b) => b.id === c.id)
-        );
+    return dedupeRequest(cacheKey, async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/groups`, {
+          headers: { ...this.getAuthHeaders() },
+          signal: AbortSignal.timeout(8000),
+        });
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data)) {
+          const cached = loadLocal(storageKey, fallbackGroups);
+          const localOnlyGroups = cached.filter(
+            (c) => c.id.startsWith("g-") && !json.data.some((b) => b.id === c.id)
+          );
 
-        const merged = [
-          ...json.data.map((g) => {
-            const c = cached.find((x) => x.id === g.id);
-            let paidList = [];
-            if (c && Array.isArray(c.paid_members)) {
-              paidList = c.paid_members;
-            } else if (g.paid_members) {
-              paidList = g.paid_members.split(",").map((s) => s.trim()).filter(Boolean);
-            } else {
-              paidList = [g.leader_name];
-            }
-            return {
-              ...g,
-              paid_members: paidList,
-            };
-          }),
-          ...localOnlyGroups,
-        ];
+          const merged = [
+            ...json.data.map((g) => {
+              const c = cached.find((x) => x.id === g.id);
+              let paidList = [];
+              if (c && Array.isArray(c.paid_members)) {
+                paidList = c.paid_members;
+              } else if (g.paid_members) {
+                paidList = g.paid_members.split(",").map((s) => s.trim()).filter(Boolean);
+              } else {
+                paidList = [g.leader_name];
+              }
+              return {
+                ...g,
+                paid_members: paidList,
+              };
+            }),
+            ...localOnlyGroups,
+          ];
 
-        saveLocal(storageKey, merged);
-        return { data: merged, source: "live" };
+          saveLocal(storageKey, merged);
+          const result = { data: merged, source: "live" };
+          setMemCache(cacheKey, result);
+          return result;
+        }
+      } catch {
+        // fallback
       }
-    } catch {
-      // fallback
-    }
-    const cached = loadLocal(storageKey, fallbackGroups);
-    return { data: cached, source: "cache" };
+      const cached = loadLocal(storageKey, fallbackGroups);
+      const result = { data: cached, source: "cache" };
+      setMemCache(cacheKey, result);
+      return result;
+    });
   },
 
   async getGroupById(id) {
@@ -430,6 +509,7 @@ export const dataService = {
   },
 
   async createGroup(payload) {
+    invalidateMemCache("groups:");
     const user = this.getStoredUser();
     const storageKey = this.getUserGroupKey();
     const fallbackGroups = this.getUserInitialGroups();
@@ -487,6 +567,7 @@ export const dataService = {
   },
 
   async updateGroup(id, payload) {
+    invalidateMemCache("groups:");
     const storageKey = this.getUserGroupKey();
     const fallbackGroups = this.getUserInitialGroups();
 
@@ -523,6 +604,7 @@ export const dataService = {
   },
 
   async deleteGroup(id) {
+    invalidateMemCache("groups:");
     const storageKey = this.getUserGroupKey();
     const fallbackGroups = this.getUserInitialGroups();
 
@@ -750,6 +832,7 @@ export const dataService = {
   },
 
   logout() {
+    invalidateMemCache("groups:");
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     localStorage.removeItem(STORAGE_KEYS.AUTH_USER);
     this.notifyAuthChanged(null);

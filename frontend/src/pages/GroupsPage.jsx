@@ -77,9 +77,12 @@ function calculateDueDays(billingDay) {
 export default function GroupsPage() {
   const location = useLocation();
   const [currentUser, setCurrentUser] = useState(() => dataService.getStoredUser());
-  const [groups, setGroups] = useState([]);
-  const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [groups, setGroups] = useState(() => dataService.getCachedGroups());
+  const [services, setServices] = useState(() => dataService.getCachedServices());
+  const [loading, setLoading] = useState(() => {
+    const user = dataService.getStoredUser();
+    return user ? dataService.getCachedGroups().length === 0 : false;
+  });
   const [showModal, setShowModal] = useState(false);
   const [searchFilter, setSearchFilter] = useState("");
 
@@ -110,7 +113,6 @@ export default function GroupsPage() {
 
   const loadGroups = useCallback(async () => {
     try {
-      setLoading(true);
       const [groupsRes, servicesRes] = await Promise.all([
         dataService.getGroups(),
         dataService.getServices(),

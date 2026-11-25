@@ -10,19 +10,19 @@ const currencyFormatter = new Intl.NumberFormat("id-ID", {
 });
 
 export default function ServicesPage() {
-  const [services, setServices] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [services, setServices] = useState(() => dataService.getCachedServices());
+  const [categories, setCategories] = useState(() => dataService.getCachedCategories());
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [dataSource, setDataSource] = useState("init");
-  const [loading, setLoading] = useState(true);
+  const [dataSource, setDataSource] = useState("cache");
+  const [loading, setLoading] = useState(() => dataService.getCachedServices().length === 0);
 
   // New Service Modal state
   const [showAddModal, setShowAddModal] = useState(false);
   const [newSku, setNewSku] = useState("");
   const [newName, setNewName] = useState("");
   const [newDesc, setNewDesc] = useState("");
-  const [newCatId, setNewCatId] = useState("");
+  const [newCatId, setNewCatId] = useState(() => dataService.getCachedCategories()[0]?.id || "");
   const [newPrice, setNewPrice] = useState("");
   const [newSlots, setNewSlots] = useState("4");
   const [submittingService, setSubmittingService] = useState(false);
@@ -30,7 +30,6 @@ export default function ServicesPage() {
 
   const loadData = useCallback(async () => {
     try {
-      setLoading(true);
       const [servicesRes, categoriesRes] = await Promise.all([
         dataService.getServices(),
         dataService.getCategories(),
@@ -38,15 +37,15 @@ export default function ServicesPage() {
       setServices(servicesRes.data || []);
       setCategories(categoriesRes.data || []);
       setDataSource(servicesRes.source);
-      if (categoriesRes.data && categoriesRes.data.length > 0 && !newCatId) {
-        setNewCatId(categoriesRes.data[0].id);
+      if (categoriesRes.data && categoriesRes.data.length > 0) {
+        setNewCatId((prev) => prev || categoriesRes.data[0].id);
       }
     } catch (err) {
       console.error("Gagal membaca registry layanan:", err);
     } finally {
       setLoading(false);
     }
-  }, [newCatId]);
+  }, []);
 
   useEffect(() => {
     loadData();
