@@ -3,7 +3,9 @@ import { categoryModel } from "../models/categoryModel.js";
 export const categoryController = {
   async getAll(req, res) {
     try {
-      const data = await categoryModel.getAll();
+      const limit = req.query.limit !== undefined ? parseInt(req.query.limit, 10) : undefined;
+      const offset = req.query.offset !== undefined ? parseInt(req.query.offset, 10) : 0;
+      const data = await categoryModel.getAll({ limit, offset });
       return res.status(200).json({ success: true, data });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });

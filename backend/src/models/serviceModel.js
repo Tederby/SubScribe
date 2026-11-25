@@ -3,11 +3,18 @@ import { supabase } from "../config/supabaseClient.js";
 const SERVICE_SELECT_QUERY = "id, sku, name, description, monthly_price, max_slots, category_id, categories ( id, name )";
 
 export const serviceModel = {
-  async getAll() {
-    const { data, error } = await supabase
+  async getAll({ limit, offset = 0 } = {}) {
+    let query = supabase
       .from("services")
       .select(SERVICE_SELECT_QUERY)
       .order("name", { ascending: true });
+
+    if (Number.isInteger(limit) && limit > 0) {
+      const safeOffset = Number.isInteger(offset) && offset >= 0 ? offset : 0;
+      query = query.range(safeOffset, safeOffset + limit - 1);
+    }
+
+    const { data, error } = await query;
     if (error) throw error;
     return data;
   },

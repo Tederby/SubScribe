@@ -3,7 +3,9 @@ import { serviceModel } from "../models/serviceModel.js";
 export const serviceController = {
   async getAll(req, res) {
     try {
-      const data = await serviceModel.getAll();
+      const limit = req.query.limit !== undefined ? parseInt(req.query.limit, 10) : undefined;
+      const offset = req.query.offset !== undefined ? parseInt(req.query.offset, 10) : 0;
+      const data = await serviceModel.getAll({ limit, offset });
       return res.status(200).json({ success: true, data });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });

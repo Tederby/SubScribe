@@ -45,6 +45,9 @@ create table if not exists split_groups (
 -- Ensure user_id column exists when upgrading from older 3-table schema
 alter table split_groups add column if not exists user_id uuid references users(id) on delete cascade;
 
+-- Composite index to optimize per-user list queries ordered by billing_day
+create index if not exists idx_split_groups_user_billing on split_groups(user_id, billing_day);
+
 -- Access Grants & Permissions for API (Bypasses RLS blocks for educational backend MVC)
 alter table categories disable row level security;
 alter table services disable row level security;

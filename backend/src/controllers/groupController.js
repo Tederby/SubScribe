@@ -4,7 +4,9 @@ export const groupController = {
   async getAll(req, res) {
     try {
       const userId = req.user?.id;
-      const data = await groupModel.getAll(userId);
+      const limit = req.query.limit !== undefined ? parseInt(req.query.limit, 10) : undefined;
+      const offset = req.query.offset !== undefined ? parseInt(req.query.offset, 10) : 0;
+      const data = await groupModel.getAll(userId, { limit, offset });
       return res.status(200).json({ success: true, data });
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message });

@@ -28,6 +28,9 @@ let FALLBACK_GROUPS = [
   },
 ];
 
+const GROUP_SELECT_QUERY =
+  "id, user_id, group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members";
+
 function isSupabaseConfigured() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_KEY;
@@ -35,15 +38,19 @@ function isSupabaseConfigured() {
 }
 
 export const groupModel = {
-  async getAll(userId) {
+  async getAll(userId, { limit, offset = 0 } = {}) {
     if (isSupabaseConfigured()) {
       let query = supabase
         .from("split_groups")
-        .select("*")
+        .select(GROUP_SELECT_QUERY)
         .order("billing_day", { ascending: true });
 
       if (userId) {
         query = query.eq("user_id", userId);
+      }
+      if (Number.isInteger(limit) && limit > 0) {
+        const safeOffset = Number.isInteger(offset) && offset >= 0 ? offset : 0;
+        query = query.range(safeOffset, safeOffset + limit - 1);
       }
 
       const { data, error } = await query;
@@ -55,15 +62,19 @@ export const groupModel = {
     }
 
     // In-memory filter by user_id
-    if (!userId) return FALLBACK_GROUPS;
-    return FALLBACK_GROUPS.filter((g) => g.user_id === userId);
+    const filtered = userId ? FALLBACK_GROUPS.filter((g) => g.user_id === userId) : FALLBACK_GROUPS;
+    if (Number.isInteger(limit) && limit > 0) {
+      const safeOffset = Number.isInteger(offset) && offset >= 0 ? offset : 0;
+      return filtered.slice(safeOffset, safeOffset + limit);
+    }
+    return filtered;
   },
 
   async getById(id, userId) {
     if (isSupabaseConfigured()) {
       let query = supabase
         .from("split_groups")
-        .select("*")
+        .select(GROUP_SELECT_QUERY)
         .eq("id", id);
 
       if (userId) {
