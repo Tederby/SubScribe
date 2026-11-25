@@ -4,7 +4,7 @@ import crypto from "crypto";
 // Fallback in-memory user registry for offline development or placeholder Supabase mode
 const FALLBACK_USERS = [
   {
-    id: "u1111111-1111-1111-1111-111111111111",
+    id: "d1111111-1111-1111-1111-111111111111",
     email: "admin@subscribe.local",
     password_hash: "a1b2c3d4e5f60718:bb2b5e7fe90a5873b38e440bdb252b705addf3bcf8a822a14f03c6a98d17e8376d0d85c118f6a5e820bc7e84d778197b1d9450e44ca6f1a4e9db1a0b4f44b0f7", // password: admin123
     name: "Operator Admin",
@@ -23,40 +23,36 @@ export const userModel = {
   async findByEmail(email) {
     const cleanEmail = email.trim().toLowerCase();
     if (isSupabaseConfigured()) {
-      try {
-        const { data, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("email", cleanEmail)
-          .single();
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", cleanEmail)
+        .maybeSingle();
 
-        if (!error && data) {
-          return data;
-        }
-      } catch {
-        // Fallback below
+      if (error) {
+        console.error("[SUPABASE_USER_FIND_BY_EMAIL_ERROR]", error);
+        throw new Error(`Database error: ${error.message}`);
       }
+      return data;
     }
 
-    // In-memory / local fallback
+    // In-memory / local fallback when Supabase is not configured
     return FALLBACK_USERS.find((u) => u.email.toLowerCase() === cleanEmail) || null;
   },
 
   async findById(id) {
     if (isSupabaseConfigured()) {
-      try {
-        const { data, error } = await supabase
-          .from("users")
-          .select("id, email, name, role, created_at")
-          .eq("id", id)
-          .single();
+      const { data, error } = await supabase
+        .from("users")
+        .select("id, email, name, role, created_at")
+        .eq("id", id)
+        .maybeSingle();
 
-        if (!error && data) {
-          return data;
-        }
-      } catch {
-        // Fallback below
+      if (error) {
+        console.error("[SUPABASE_USER_FIND_BY_ID_ERROR]", error);
+        throw new Error(`Database error: ${error.message}`);
       }
+      return data;
     }
 
     const fallback = FALLBACK_USERS.find((u) => u.id === id);
@@ -75,20 +71,17 @@ export const userModel = {
     };
 
     if (isSupabaseConfigured()) {
-      try {
-        const { data, error } = await supabase
-          .from("users")
-          .insert(payload)
-          .select("id, email, name, role, created_at")
-          .single();
+      const { data, error } = await supabase
+        .from("users")
+        .insert(payload)
+        .select("id, email, name, role, created_at")
+        .single();
 
-        if (!error && data) {
-          FALLBACK_USERS.push({ ...data, password_hash });
-          return data;
-        }
-      } catch {
-        // Fallback below
+      if (error) {
+        console.error("[SUPABASE_USER_CREATE_ERROR]", error);
+        throw new Error(`Database error: ${error.message}`);
       }
+      return data;
     }
 
     const newLocalUser = {

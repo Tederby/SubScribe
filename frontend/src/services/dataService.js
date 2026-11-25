@@ -234,7 +234,7 @@ export const dataService = {
   // 1. Categories
   async getCategories() {
     try {
-      const res = await fetch(`${API_URL}/api/categories`, { signal: AbortSignal.timeout(2500) });
+      const res = await fetch(`${API_URL}/api/categories`, { signal: AbortSignal.timeout(8000) });
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
         // Safe offline merge: preserve locally created categories (id starting with c-)
@@ -262,7 +262,7 @@ export const dataService = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(8000),
       });
       const json = await res.json();
       if (json.success && json.data) {
@@ -284,7 +284,7 @@ export const dataService = {
   // 2. Services
   async getServices() {
     try {
-      const res = await fetch(`${API_URL}/api/services`, { signal: AbortSignal.timeout(2500) });
+      const res = await fetch(`${API_URL}/api/services`, { signal: AbortSignal.timeout(8000) });
       const json = await res.json();
       if (json.success && Array.isArray(json.data) && json.data.length > 0) {
         // Safe merge: keep local services created offline
@@ -303,7 +303,7 @@ export const dataService = {
 
   async getServiceById(id) {
     try {
-      const res = await fetch(`${API_URL}/api/services/${id}`, { signal: AbortSignal.timeout(2500) });
+      const res = await fetch(`${API_URL}/api/services/${id}`, { signal: AbortSignal.timeout(8000) });
       const json = await res.json();
       if (json.success && json.data) {
         return json.data;
@@ -334,7 +334,7 @@ export const dataService = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(8000),
       });
       const json = await res.json();
       if (json.success && json.data) {
@@ -366,7 +366,7 @@ export const dataService = {
     try {
       const res = await fetch(`${API_URL}/api/groups`, {
         headers: { ...this.getAuthHeaders() },
-        signal: AbortSignal.timeout(2500),
+        signal: AbortSignal.timeout(8000),
       });
       const json = await res.json();
       if (json.success && Array.isArray(json.data)) {
@@ -411,7 +411,7 @@ export const dataService = {
     try {
       const res = await fetch(`${API_URL}/api/groups/${id}`, {
         headers: { ...this.getAuthHeaders() },
-        signal: AbortSignal.timeout(2500),
+        signal: AbortSignal.timeout(8000),
       });
       const json = await res.json();
       if (json.success && json.data) {
@@ -466,7 +466,7 @@ export const dataService = {
           ...this.getAuthHeaders(),
         },
         body: JSON.stringify(backendPayload),
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(8000),
       });
       const json = await res.json();
       if (json.success && json.data) {
@@ -511,7 +511,7 @@ export const dataService = {
           ...this.getAuthHeaders(),
         },
         body: JSON.stringify(backendPayload),
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(8000),
       });
     } catch {
       // offline
@@ -530,7 +530,7 @@ export const dataService = {
       await fetch(`${API_URL}/api/groups/${id}`, {
         method: "DELETE",
         headers: { ...this.getAuthHeaders() },
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(8000),
       });
     } catch {
       // offline
@@ -544,7 +544,9 @@ export const dataService = {
 
   // Toggle member payment status for a specific group
   toggleMemberPayment(groupId, memberName) {
-    const list = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+    const storageKey = this.getUserGroupKey();
+    const fallbackGroups = this.getUserInitialGroups();
+    const list = loadLocal(storageKey, fallbackGroups);
     const grp = list.find((g) => g.id === groupId);
     if (!grp) return null;
 
@@ -556,7 +558,7 @@ export const dataService = {
       updated = [...paidList, memberName];
     }
     grp.paid_members = updated;
-    saveLocal(STORAGE_KEYS.GROUPS, list);
+    saveLocal(storageKey, list);
 
     // Asynchronously update backend if possible
     this.updateGroup(groupId, { paid_members: updated });
@@ -565,7 +567,9 @@ export const dataService = {
 
   // Add member to group roster
   addMemberToGroup(groupId, newMemberName) {
-    const list = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+    const storageKey = this.getUserGroupKey();
+    const fallbackGroups = this.getUserInitialGroups();
+    const list = loadLocal(storageKey, fallbackGroups);
     const grp = list.find((g) => g.id === groupId);
     if (!grp) return null;
 
@@ -576,7 +580,7 @@ export const dataService = {
     if (!existing.includes(trimmed)) {
       existing.push(trimmed);
       grp.member_list = existing.join(", ");
-      saveLocal(STORAGE_KEYS.GROUPS, list);
+      saveLocal(storageKey, list);
 
       // Async backend update
       this.updateGroup(groupId, { member_list: grp.member_list });
@@ -586,7 +590,9 @@ export const dataService = {
 
   // Remove member from group roster and payment list
   removeMemberFromGroup(groupId, memberName) {
-    const list = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+    const storageKey = this.getUserGroupKey();
+    const fallbackGroups = this.getUserInitialGroups();
+    const list = loadLocal(storageKey, fallbackGroups);
     const grp = list.find((g) => g.id === groupId);
     if (!grp) return null;
 
@@ -598,7 +604,7 @@ export const dataService = {
 
     grp.member_list = filteredMembers.join(", ");
     grp.paid_members = filteredPaid;
-    saveLocal(STORAGE_KEYS.GROUPS, list);
+    saveLocal(storageKey, list);
 
     // Async backend update
     this.updateGroup(groupId, {
@@ -610,13 +616,15 @@ export const dataService = {
 
   // Reset billing cycle for a new month (marks all unpaid except optionally the leader)
   resetBillingCycle(groupId) {
-    const list = loadLocal(STORAGE_KEYS.GROUPS, INITIAL_GROUPS);
+    const storageKey = this.getUserGroupKey();
+    const fallbackGroups = this.getUserInitialGroups();
+    const list = loadLocal(storageKey, fallbackGroups);
     const grp = list.find((g) => g.id === groupId);
     if (!grp) return null;
 
     // Reset paid members: keep leader if desired or start fresh
     grp.paid_members = [grp.leader_name];
-    saveLocal(STORAGE_KEYS.GROUPS, list);
+    saveLocal(storageKey, list);
 
     this.updateGroup(groupId, { paid_members: grp.paid_members });
     return grp;
@@ -673,7 +681,7 @@ export const dataService = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-        signal: AbortSignal.timeout(3500),
+        signal: AbortSignal.timeout(8000),
       });
       const json = await res.json();
       if (json.success && json.data) {
@@ -688,7 +696,7 @@ export const dataService = {
       if (email.toLowerCase() === "admin@subscribe.local" && password === "admin123") {
         const mockData = {
           user: {
-            id: "u1111111-1111-1111-1111-111111111111",
+            id: "d1111111-1111-1111-1111-111111111111",
             email: "admin@subscribe.local",
             name: "Operator Admin (Local)",
             role: "operator",
@@ -710,7 +718,7 @@ export const dataService = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, name }),
-        signal: AbortSignal.timeout(3500),
+        signal: AbortSignal.timeout(8000),
       });
       const json = await res.json();
       if (json.success && json.data) {

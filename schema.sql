@@ -42,6 +42,9 @@ create table if not exists split_groups (
   paid_members text default '' -- Comma-separated paid members for cycle tracking
 );
 
+-- Ensure user_id column exists when upgrading from older 3-table schema
+alter table split_groups add column if not exists user_id uuid references users(id) on delete cascade;
+
 -- Access Grants & Permissions for API (Bypasses RLS blocks for educational backend MVC)
 alter table categories disable row level security;
 alter table services disable row level security;
@@ -55,7 +58,7 @@ grant all on all sequences in schema public to anon, authenticated, service_role
 -- 5. Initial Seed Data (Indonesian Digital Subscriptions & Operator)
 -- Insert Seed Operator (Password: admin123)
 insert into users (id, email, password_hash, name, role) values
-  ('u1111111-1111-1111-1111-111111111111', 'admin@subscribe.local', 'a1b2c3d4e5f60718:bb2b5e7fe90a5873b38e440bdb252b705addf3bcf8a822a14f03c6a98d17e8376d0d85c118f6a5e820bc7e84d778197b1d9450e44ca6f1a4e9db1a0b4f44b0f7', 'Operator Admin', 'operator')
+  ('d1111111-1111-1111-1111-111111111111', 'admin@subscribe.local', 'a1b2c3d4e5f60718:bb2b5e7fe90a5873b38e440bdb252b705addf3bcf8a822a14f03c6a98d17e8376d0d85c118f6a5e820bc7e84d778197b1d9450e44ca6f1a4e9db1a0b4f44b0f7', 'Operator Admin', 'operator')
 on conflict (email) do nothing;
 -- Insert Categories
 insert into categories (id, name) values
@@ -182,7 +185,7 @@ on conflict (sku) do nothing;
 insert into split_groups (id, user_id, group_name, service_name, leader_name, leader_phone, price_per_person, billing_day, member_list, paid_members) values
   (
     'b1111111-1111-1111-1111-111111111111',
-    'u1111111-1111-1111-1111-111111111111',
+    'd1111111-1111-1111-1111-111111111111',
     'Netflix Nonton Bareng Kos',
     'Netflix Premium',
     'Budi Santoso',
@@ -194,7 +197,7 @@ insert into split_groups (id, user_id, group_name, service_name, leader_name, le
   ),
   (
     'b2222222-2222-2222-2222-222222222222',
-    'u1111111-1111-1111-1111-111111111111',
+    'd1111111-1111-1111-1111-111111111111',
     'Spotify Musikan Circle',
     'Spotify Family',
     'Citra Dewi',
@@ -205,4 +208,7 @@ insert into split_groups (id, user_id, group_name, service_name, leader_name, le
     'Citra Dewi, Eko Nugroho, Fajar Setiawan'
   )
 on conflict (id) do nothing;
+
+-- Backfill user_id on existing rows created before user_id column existed
+update split_groups set user_id = 'd1111111-1111-1111-1111-111111111111' where user_id is null;
 
